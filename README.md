@@ -8,12 +8,14 @@
 <!-- Don't have any of your custom contents above; they won't occur if there is no citation. -->
 
 ## Introduction
+This package provides specific functions and utilities for TWAI-SWC-Forecast projects.
 
-This is a julia package created using `okatsn`'s preference, and this package is expected to be registered to [okatsn/OkRegistry](https://github.com/okatsn/OkRegistry) for CIs to work properly.
+
+> This is a julia package created using `okatsn`'s preference, and this package is expected to be registered to [okatsn/OkRegistry](https://github.com/okatsn/OkRegistry) for CIs to work properly.
 
 !!! note Checklist
-    - [ ] Create an empty repository (namely, `https://github.com/okatsn/SWCForecastBase.jl.git`) on github, and push the local to origin. See [connecting to remote](#tips-for-connecting-to-remote).
-    - [ ] Add `ACCESS_OKREGISTRY` secret in the settings of this repository on Github, or delete both `register.yml` and `TagBot.yml` in `/.github/workflows/`. See [Auto-Registration](#auto-registration).
+    - [x] Create an empty repository (namely, `https://github.com/okatsn/SWCForecastBase.jl.git`) on github, and push the local to origin. See [connecting to remote](#tips-for-connecting-to-remote).
+    - [x] Add `ACCESS_OKREGISTRY` secret in the settings of this repository on Github, or delete both `register.yml` and `TagBot.yml` in `/.github/workflows/`. See [Auto-Registration](#auto-registration).
 
 
 ### Go to [OkPkgTemplates](https://github.com/okatsn/OkPkgTemplates.jl) for more information
