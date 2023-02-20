@@ -14,6 +14,7 @@ include("series2supervised.jl")
 export series2supervised
 
 
-include("movingaverage.jl")
+
+using NaNMath
 include("precipitation.jl")
 end

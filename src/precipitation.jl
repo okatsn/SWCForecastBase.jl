@@ -1,5 +1,15 @@
 """
-Add columns that are derived by accumulating corresponding variables using `slowmvnanmean`.
+`movingaverage(v, n)` returns a vector of moving averaged `v` by every `n`.
+"""
+function movingaverage(v::Vector{<:AbstractFloat}, n::Int)
+    lenv = length(v)
+    @assert isequal(eachindex(v), 1:lenv) "`eachindex(v)` is not equal to `1:length(v)`."
+    [NaNMath.mean(v[id0:id1]) for (id0, id1) in zip(n:lenv, 1:(lenv-n+1))]
+end
+
+
+"""
+Add columns that are derived by accumulating corresponding variables using `movingaverage`.
 
 # Example
 ```julia
@@ -17,13 +27,13 @@ addcol_accumulation!(df, all_precipstr, apd)
 
 ```
 
-See also: `slowmvnanmean`.
+See also: `movingaverage`.
 """
 function addcol_accumulation!(df, all_precipstr, apd)
     if !isempty(apd)
         for pstr in all_precipstr
             for (k, v) in apd
-                DataFrames.transform!(df, pstr => (x -> slowmvnanmean(x, v).*v) => Symbol("$(pstr)_$k"))
+                DataFrames.transform!(df, pstr => (x -> movingaverage(x, v).*v) => Symbol("$(pstr)_$k"))
             end
         end
 
