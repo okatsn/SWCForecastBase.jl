@@ -3,7 +3,7 @@
 
 This is the function that performs best on https://stackoverflow.com/questions/59562325/moving-average-in-julia.
 """
-function mvmean(arr, n)
+function mvmean(arr::Vector{<:AbstractFloat}, n)
     return rolling_mean(arr, n)
 end
 
@@ -25,7 +25,7 @@ function mvnanmean(arr, n)
     return out
 end
 
-function slowmvnanmean(y, winsz)
+function slowmvnanmean(y::Vector{<:AbstractFloat}, winsz)
     leny = length(y)
     ind0s = 1:(leny-winsz+1)
     ind1s = winsz:leny
@@ -86,7 +86,7 @@ end
 """
 my moving average function of poor performance
 """
-function mymovwinmean(y::Vector{Float64}, winsz)
+function mymovwinmean(y::Vector{<:AbstractFloat}, winsz)
     leny = length(y)
     ind0s = 1:leny-winsz+1
     ind1s = winsz:leny
@@ -107,7 +107,8 @@ function moving_average2(vs, n)
     for i in 1:(length(vs)-(n-1))
         out[i+n-1] = sum(@view vs[i:(i+n-1)])/n
     end
-end
+    return out
+end # TODO: untested or problematic
 
 function rolling_sum(arr, n)
     so_far = sum(arr[1:n])
@@ -146,7 +147,7 @@ function rolling_mean3nan(arr, n)
         out[i+1] = so_far / n
     end
     return vcat(fill(NaN,n-1), out)
-end
+end # TODO: untested or problematic
 
 
 function rolling_mean4(arr, n)

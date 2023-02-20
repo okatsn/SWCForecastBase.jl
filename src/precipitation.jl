@@ -1,5 +1,5 @@
 """
-Add columns that are derived by accumulating corresponding variables.
+Add columns that are derived by accumulating corresponding variables using `slowmvnanmean`.
 
 # Example
 ```julia
@@ -17,6 +17,7 @@ addcol_accumulation!(df, all_precipstr, apd)
 
 ```
 
+See also: `slowmvnanmean`.
 """
 function addcol_accumulation!(df, all_precipstr, apd)
     if !isempty(apd)
@@ -26,12 +27,14 @@ function addcol_accumulation!(df, all_precipstr, apd)
             end
         end
 
-        deleteat!(df, 1:maximum(values(apd)))
+        deleteat!(df, 1:(maximum(values(apd))-1))
     else
         @warn "apd is empty."
     end
     return df
 end
+
+# CHECKPOINT: write a function cumulate! that given a dataframe, returns accumulative columns as that in addcol_accumulation!, but make the first few necessarly rows `missing` instead of `deleteat!` them.
 
 """
 Of a time series `ts`, `cccount(ts)` calculate by default the cumulative counts of elements that approximates zero consecutively.
