@@ -12,4 +12,8 @@ export chknnm, isnnm, islnan
 using ShiftedArrays
 include("series2supervised.jl")
 export series2supervised
+
+
+include("movingaverage.jl")
+include("precipitation.jl")
 end
