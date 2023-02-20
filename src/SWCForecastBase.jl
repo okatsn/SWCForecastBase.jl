@@ -17,4 +17,5 @@ export series2supervised
 
 using NaNMath
 include("precipitation.jl")
+export movingaverage
 end

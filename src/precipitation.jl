@@ -4,8 +4,11 @@
 function movingaverage(v::Vector{<:AbstractFloat}, n::Int)
     lenv = length(v)
     @assert isequal(eachindex(v), 1:lenv) "`eachindex(v)` is not equal to `1:length(v)`."
-    [NaNMath.mean(v[id0:id1]) for (id0, id1) in zip(n:lenv, 1:(lenv-n+1))]
+    out = fill(NaN, lenv)
+    out[n:end] .= [NaNMath.mean(v[id0:id1]) for (id0, id1) in zip(1:(lenv-n+1), n:lenv)]
+    return out
 end
+
 
 
 """
