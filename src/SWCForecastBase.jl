@@ -18,4 +18,9 @@ export series2supervised
 using NaNMath
 include("precipitation.jl")
 export movingaverage
+
+
+include("mljmodels/treemodels.jl")
+export fstree, twofstree, manytrees
+
 end
