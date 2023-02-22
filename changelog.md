@@ -10,3 +10,9 @@ Add utilities
 
 New features
 - `movingaverage`
+
+## v0.3.0
+Add basic tree models
+
+## v0.3.1
+Fix dependencies and update compat

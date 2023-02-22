@@ -19,7 +19,7 @@ using NaNMath
 include("precipitation.jl")
 export movingaverage
 
-
+using MLJ
 include("mljmodels/treemodels.jl")
 export fstree, twofstree, manytrees
 
