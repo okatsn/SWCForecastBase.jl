@@ -1,4 +1,4 @@
-using Dates, DataFrames, OkMakieToolkits
+using Dates, DataFrames
 @testset "dataoverview.jl" begin
     a = randn(100)
     a[1:20] .= NaN
@@ -7,7 +7,7 @@ using Dates, DataFrames, OkMakieToolkits
     b[71:90] .= NaN
     b[91:100] .= missing
     table_nan = DataFrame(:a => [1,2,NaN], :b => [missing,missing,5], :dt => collect(DateTime("2022-01-01T00:00:00"):Day(1):DateTime("2022-01-03T00:00:00")))
-    f, ax, dfxx = dataoverview!(table_nan, DateTime; resolution = (800,500))
+    SWCForecastBase.dataoverview(table_nan, DateTime)
 
     @test true
 end

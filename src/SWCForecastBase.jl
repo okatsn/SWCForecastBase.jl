@@ -23,4 +23,5 @@ using MLJ
 include("mljmodels/treemodels.jl")
 export fstree, twofstree, manytrees
 
+include("forplot/dataoverview.jl")
 end
