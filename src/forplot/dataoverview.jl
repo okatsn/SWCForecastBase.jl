@@ -21,7 +21,10 @@ xs, ys, vs, xtick_label, ytick_label = dataoverview(table_nan, DateTime)
 Makie.save("Fig_dataoverview.eps", f)
 ```
 """
-function dataoverview(df::DataFrame, xtype::DataType; gridsize = gridsize, set_left_edge=leftfn, set_right_edge=rightfn)
+function dataoverview(df::DataFrame, xtype::DataType;
+    gridsize = gridsize,
+    set_left_edge=leftfn,
+    set_right_edge=rightfn)
 
     df = deepcopy(df)
     iddt = isequal.(eltype.(eachcol(df)), xtype)

@@ -24,4 +24,8 @@ include("mljmodels/treemodels.jl")
 export fstree, twofstree, manytrees
 
 include("forplot/dataoverview.jl")
+
+using Dates, Statistics, DataFrames, ShiftedArrays
+include("forplot/dataratio.jl")
+export dataratio
 end
