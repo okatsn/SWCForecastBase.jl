@@ -1,9 +1,15 @@
+struct DataInterval
+    from
+    until
+    identifier
+end
+
 """
 An `DataRatio` object that stores the results of `dataratio`.
 """
 struct DataRatio
     table::DataFrame
-    gridsize::DatePeriod
+    dataintervals::StructArray
 end
 
 """
@@ -11,7 +17,14 @@ end
 """
 function DataRatio(df, gridsize, iswhat; kwargs...)
     table = dataratio(df, gridsize, iswhat)
-    DataRatio(table, gridsize)
+    DR = DataRatio(table, StructArray{DataInterval}((
+                        table.range_from,
+                        table.range_until,
+                        table.interval_id)
+                        )
+                    )
+    table = select!(table, Not([:range_from, :range_until, :interval_id])) # Noted that DR.table is (should) be changed!
+    return DR
 end
 
 

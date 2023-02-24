@@ -25,7 +25,7 @@ export fstree, twofstree, manytrees
 
 include("forplot/dataoverview.jl")
 
-using Dates, Statistics, DataFrames, ShiftedArrays
+using Dates, Statistics, DataFrames, ShiftedArrays, StructArrays
 include("forplot/dataratio.jl")
 export dataratio, DataRatio, transform_datetime!
 end

@@ -26,8 +26,12 @@
         # Test dataratio basic behaviors
         @test isequal(df0, ari0) # input df0 should not be modified.
 
-        # Basic content check
-        @test isequal(table, DR.table)
-        @test isequal(gridsize, DR.gridsize)
+        # `DR.table` does not contains info of [:range_from, :range_until, :interval_id]
+        @test isequal(table[!, 4:end], DR.table)
+
+        # test the equality of results from dataratio and DataRatio
+        @test isequal(table.range_from, DR.dataintervals.from)
+        @test isequal(table.range_until, DR.dataintervals.until)
+        @test isequal(table.interval_id, DR.dataintervals.identifier)
     end
 end
