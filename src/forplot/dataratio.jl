@@ -129,15 +129,6 @@ ari0 = SWCDatasets.dataset("NCUWiseLab", "ARI_G2F820")
 DR = DataRatio(ari0, Month(1), SWCForecastBase.islnan)
 DR |> convert_arguments |> x -> heatmap(x...)
 ```
-
-or
-
-```julia
-f = Figure(; resolution=(800,600))
-ax = Axis(f[1,1])
-hmap = SWCForecastBase.heatmap!(ax, DR; colormap = "diverging_rainbow_bgymr_45_85_c67_n256")
-Colorbar(f[1, 2], hmap, label = "missing data rate")
-```
 """
 function convert_arguments(DR::DataRatio)
 
@@ -161,11 +152,22 @@ function convert_arguments(DR::DataRatio)
     return args
 end
 
+"""
+# Example
+```julia
+f = Figure(; resolution=(800,600))
+ax = Axis(f[1,1])
+hmap = SWCForecastBase.heatmap!(ax, DR::DataRatio; colormap = "diverging_rainbow_bgymr_45_85_c67_n256")
+Colorbar(f[1, 2], hmap, label = "missing data rate")
+```
 
+See `DataRatio` and `SWCForecastBase.convert_arguments`.
+
+"""
 function heatmap!(ax, DR::DataRatio; kwargs...)
     hmap = CairoMakie.heatmap!(ax, convert_arguments(DR)...; kwargs...)
     ytick_label = DR.table |> names
-    xlabels = DR.dataintervals.from |> dt -> Dates.format.(dt, "u.")
+    xlabels = DR.dataintervals.from |> dt -> Dates.format.(dt, "d/u.")
     xticks = DR.dataintervals.identifier # interval_id
     xtick_label = [(t, l) for (t, l) in zip(xticks, xlabels)]
 
