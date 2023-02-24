@@ -1,17 +1,18 @@
 """
 An `DataRatio` object that stores the results of `dataratio`.
-`DataRatio` constructor accept exactly the same arguments as `dataratio`.
 """
 struct DataRatio
     table::DataFrame
     gridsize::DatePeriod
-    ratioof::Function
-    function DataRatio(df, gridsize, iswhat; kwargs...)
-        (table, iswhat) = dataratio(df, gridsize, iswhat)
-        new(table, gridsize, iswhat)
-    end
 end
 
+"""
+`DataRatio` constructor accept exactly the same arguments as `dataratio`.
+"""
+function DataRatio(df, gridsize, iswhat; kwargs...)
+    table = dataratio(df, gridsize, iswhat)
+    DataRatio(table, gridsize)
+end
 
 
 """
@@ -20,9 +21,7 @@ dataratio(df::DataFrame, gridsize::DatePeriod, iswhat::Function;
                         groupbycol=:datetime)
 ```
 
-Given data (`df`), and size of intervals in `DatePeriod` (`gridsize`), `dataratio` gives you a combined dataframe of all `Not(groupbycol)` with `ratio_in_interval` where `iswhat` for each element in a column `ByRow` is true., and `iswhat` function as given.
-
-As there is a lack of `iswhat` information in the dataframe returned, `dataratio` returns a tuple of `(table::DataFrame, iswhat)`.
+Given data (`df`), and size of intervals in `DatePeriod` (`gridsize`), `dataratio` returns a combined dataframe of all `Not(groupbycol)` with `interval_id` where `iswhat` for each element in a column `ByRow` is true.
 
 Also see `DataRatio`.
 """
@@ -57,16 +56,17 @@ function dataratio(df::DataFrame, gridsize::DatePeriod, iswhat::Function;
 
     dfranges = DataFrame(:dt0 => ShiftedArrays.lag(range0), :dt1 => range0) |> dropmissing
     DataFrames.transform!(dfranges, [:dt0, :dt1] => ByRow((t0, t1) -> (t -> (t0 <= t <= t1))) => :fnx)
-    DataFrames.transform!(dfranges, eachindex => :ratio_in_interval)
+    DataFrames.transform!(dfranges, eachindex => :interval_id)
     # fnx = [t -> row.dt0 <= t < row.dt1 for row in eachrow(dfranges)]
     # insertcols!(dfranges, :fnx => fnx)
 
     chkdt(dt::DateTime) = last(findall(map(fn -> fn(dt), dfranges.fnx))) # check a DateTime dt belonging to which group
 
     select!(df, xname, Not(xname) .=> ByRow(val -> iswhat(val) ); renamecols=false)
-    DataFrames.transform!(df, xname => ByRow(chkdt) => :ratio_in_interval )
-    dfmsrate = combine(groupby(df, :ratio_in_interval), Not(xname) .=> mean; renamecols=false)
-    return dfmsrate, iswhat
+    DataFrames.transform!(df, xname => ByRow(chkdt) => :interval_id )
+    dfmsrate = combine(groupby(df, :interval_id), Not(xname) .=> mean; renamecols=false)
+    insertcols!(dfmsrate, 1, :range_from => dfranges.dt0, :range_until => dfranges.dt1)
+    return dfmsrate
 end
 
 """

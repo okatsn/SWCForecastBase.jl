@@ -18,18 +18,16 @@
     end
 
 
+    for gridsize in [Month(1), Day(1)]
+        df0 = deepcopy(ari0)
+        table = dataratio(df0, gridsize, islnan)
+        DR = DataRatio(df0, gridsize, islnan)
 
-    gridsize = Month(1)
-    df0 = deepcopy(ari0)
-    table, iswhat = dataratio(df0, gridsize, islnan)
-    DR = DataRatio(df0, gridsize, islnan)
+        # Test dataratio basic behaviors
+        @test isequal(df0, ari0) # input df0 should not be modified.
 
-    # Test dataratio basic behaviors
-    @test isequal(islnan, iswhat)
-    @test isequal(df0, ari0) # input df0 should not be modified.
-
-    # Basic content check
-    @test isequal(table, DR.table)
-    @test isequal(iswhat, DR.ratioof)
-    @test isequal(gridsize, DR.gridsize)
+        # Basic content check
+        @test isequal(table, DR.table)
+        @test isequal(gridsize, DR.gridsize)
+    end
 end
