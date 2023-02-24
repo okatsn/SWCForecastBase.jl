@@ -138,8 +138,11 @@ function SWCForecastBase.convert_arguments(DR::DataRatio)
     ys = getindex.(last.(npts), 2) .|> Float64
     vs = last.(last.(npts))        .|> Float64
 
-    return (xs, ys, vs)
+    return (xs, ys, vs) # failed at ERROR: MethodError: no method matching to_rgba_image(::Vector{Float64}, ::Heatmap{Tuple{Vector{Float64}, Vector{Float64}, Vector{Float64}}})
+    # return (xs[:,:], ys[:,:], vs[:,:]) # heatmap(DR) works BUT the heatmap is apparently not what we want.
 end
 
-
+# FIXME:
+# - Without `SWCForecastBase.` (i.e., `SWCForecastBase.convert_arguments`), it won't work (MethodError: no method matching convert_arguments in test)
+# - With `SWCForecastBase.` and the following function, test passed BUT not worked in either this or another environment.
 SWCForecastBase.convert_arguments(P::DiscreteSurface, x::DataRatio) = convert_arguments(x)
