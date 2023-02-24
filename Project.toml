@@ -27,6 +27,6 @@ CompatHelperLocal = "5224ae11-6099-4aaa-941d-3aab004bd678"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
+SWCDatasets = "92a3a819-b5fa-4251-b583-c8bfed228d45"
 [targets]
-test = ["Test", "Documenter", "CompatHelperLocal", "Dates"]
+test = ["Test", "Documenter", "CompatHelperLocal", "Dates", "SWCDatasets"]
