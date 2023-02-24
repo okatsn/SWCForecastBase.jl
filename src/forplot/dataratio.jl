@@ -120,9 +120,26 @@ end
 
 """
 `convert_arguments(DR::DataRatio)` returns `xs, ys, vs` for `heatmap!(ax, xs, ys, vs,...)`.
-This extends Makie `convert_arguments` methods for `DataRatio`.
+This is intended to extend Makie `convert_arguments` methods for `DataRatio`, but it does not work with Makie.heatmap. Checkout git branch try-convert_arguments for more details.
+
+# Example
+```julia
+using Dates, SWCDatasets, CairoMakie
+ari0 = SWCDatasets.dataset("NCUWiseLab", "ARI_G2F820")
+DR = DataRatio(ari0, Month(1), SWCForecastBase.islnan)
+DR |> convert_arguments |> x -> heatmap(x...)
+```
+
+or
+
+```julia
+f = Figure(; resolution=(800,600))
+ax = Axis(f[1,1])
+hmap = SWCForecastBase.heatmap!(ax, DR; colormap = "diverging_rainbow_bgymr_45_85_c67_n256")
+Colorbar(f[1, 2], hmap, label = "missing data rate")
+```
 """
-function SWCForecastBase.convert_arguments(DR::DataRatio)
+function convert_arguments(DR::DataRatio)
 
     iter_columns = pairs(eachcol(DR.table))
 
@@ -130,7 +147,7 @@ function SWCForecastBase.convert_arguments(DR::DataRatio)
     name_points = [colname => (x, y, v) for (y,(colname, colval)) in enumerate(iter_columns) for (x, v) in enumerate(colval)]
 
     # ytick_label = [(y,name) for (y,(name, val)) in enumerate(iter_columns)]
-    # xtick_label = [(row.dtgroup, Dates.format(row.dt0, "u.")) for row in eachrow(dfranges)]
+    # xtick_label = [(row.interval_id, Dates.format(row.dt0, "u.")) for row in eachrow(dfranges)]
 
 
     npts = name_points
@@ -138,8 +155,21 @@ function SWCForecastBase.convert_arguments(DR::DataRatio)
     ys = getindex.(last.(npts), 2) .|> Float64
     vs = last.(last.(npts))        .|> Float64
 
-    return (xs, ys, vs)
+    args = (xs, ys, vs)
+    # kwargs = (ytick_label)
+    # return (args = args, kwargs = kwargs)
+    return args
 end
 
 
-SWCForecastBase.convert_arguments(P::DiscreteSurface, x::DataRatio) = convert_arguments(x)
+function heatmap!(ax, DR::DataRatio; kwargs...)
+    hmap = CairoMakie.heatmap!(ax, convert_arguments(DR)...; kwargs...)
+    ytick_label = DR.table |> names
+    xlabels = DR.dataintervals.from |> dt -> Dates.format.(dt, "u.")
+    xticks = DR.dataintervals.identifier # interval_id
+    xtick_label = [(t, l) for (t, l) in zip(xticks, xlabels)]
+
+    ax.yticks[] = (eachindex(ytick_label), ytick_label) # a tuple (values, names)
+    ax.xticks[] = (first.(xtick_label), string.(last.(xtick_label)))
+    return hmap
+end

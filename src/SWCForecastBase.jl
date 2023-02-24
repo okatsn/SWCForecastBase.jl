@@ -23,9 +23,10 @@ using MLJ
 include("mljmodels/treemodels.jl")
 export fstree, twofstree, manytrees
 
-include("forplot/dataoverview.jl")
+include("forplot/dataoverview.jl") # only for test
 
-using Dates, Statistics, DataFrames, ShiftedArrays, CairoMakie, StructArrays
+using Dates, Statistics, DataFrames, ShiftedArrays, StructArrays
+import CairoMakie
 include("forplot/dataratio.jl")
 export dataratio, DataRatio, transform_datetime!
 end

@@ -37,8 +37,24 @@
 end
 
 @testset "convert_arguments(DR::DataRatio)" begin
-    using SWCDatasets, CairoMakie
+    using Dates, SWCDatasets, CairoMakie
     ari0 = SWCDatasets.dataset("NCUWiseLab", "ARI_G2F820")
-    heatmap(DataRatio(ari0, Month(1), SWCForecastBase.islnan))
+    DR = DataRatio(ari0, Month(1), SWCForecastBase.islnan)
+    DR |> SWCForecastBase.convert_arguments |> x -> heatmap(x...)
     @test true
+
+
+    iter_columns = pairs(eachcol(DR.table))
+
+    # y is index to column (which data/variable), x is index to row (which interval_id)
+    name_points = [colname => (x, y, v) for (y,(colname, colval)) in enumerate(iter_columns) for (x, v) in enumerate(colval)]
+
+    ytick_label = [(y,name) for (y,(name, val)) in enumerate(iter_columns)]
+    xtick_label = [(interval_id, Dates.format(dt0, "u.")) for (interval_id, dt0) in zip(DR.dataintervals.identifier, DR.dataintervals.from)]
+    f = Figure(; resolution=(800,600))
+    ax = Axis(f[1,1])
+    hmap = SWCForecastBase.heatmap!(ax, DR; colormap = "diverging_rainbow_bgymr_45_85_c67_n256")
+    @test ax.yticks[] == (first.(ytick_label), string.(last.(ytick_label))) # a tuple (values, names)
+    @test ax.xticks[] == (first.(xtick_label), string.(last.(xtick_label)))
+    Colorbar(f[1, 2], hmap, label = "missing data rate")
 end
