@@ -27,5 +27,5 @@ include("forplot/dataoverview.jl")
 
 using Dates, Statistics, DataFrames, ShiftedArrays
 include("forplot/dataratio.jl")
-export dataratio
+export dataratio, DataRatio, transform_datetime!
 end

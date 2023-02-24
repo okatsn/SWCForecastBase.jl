@@ -17,5 +17,19 @@
         @test try df0[!, ind]; false; catch e; true end
     end
 
-    # dataratio(, Month(1))
+
+
+    gridsize = Month(1)
+    df0 = deepcopy(ari0)
+    table, iswhat = dataratio(df0, gridsize, islnan)
+    DR = DataRatio(df0, gridsize, islnan)
+
+    # Test dataratio basic behaviors
+    @test isequal(islnan, iswhat)
+    @test isequal(df0, ari0) # input df0 should not be modified.
+
+    # Basic content check
+    @test isequal(table, DR.table)
+    @test isequal(iswhat, DR.ratioof)
+    @test isequal(gridsize, DR.gridsize)
 end
