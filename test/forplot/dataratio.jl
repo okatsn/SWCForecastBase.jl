@@ -20,8 +20,8 @@
 
     for gridsize in [Month(1), Day(1)]
         df0 = deepcopy(ari0)
-        table = dataratio(df0, gridsize, islnan)
-        DR = DataRatio(df0, gridsize, islnan)
+        table = dataratio(df0, gridsize, SWCForecastBase.islnan)
+        DR = DataRatio(df0, gridsize, SWCForecastBase.islnan)
 
         # Test dataratio basic behaviors
         @test isequal(df0, ari0) # input df0 should not be modified.
@@ -34,4 +34,11 @@
         @test isequal(table.range_until, DR.dataintervals.until)
         @test isequal(table.interval_id, DR.dataintervals.identifier)
     end
+end
+
+@testset "convert_arguments(DR::DataRatio)" begin
+    using SWCDatasets, CairoMakie
+    ari0 = SWCDatasets.dataset("NCUWiseLab", "ARI_G2F820")
+    heatmap(DataRatio(ari0, Month(1), SWCForecastBase.islnan))
+    @test true
 end

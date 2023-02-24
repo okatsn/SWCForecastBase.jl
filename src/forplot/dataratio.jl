@@ -1,3 +1,14 @@
+"""
+```julia
+struct DataInterval
+    from
+    until
+    identifier
+end
+```
+
+for `DataRatio`.
+"""
 struct DataInterval
     from
     until
@@ -5,11 +16,17 @@ struct DataInterval
 end
 
 """
+```julia
+struct DataRatio
+    table::DataFrame
+    dataintervals::StructArray
+end
+```
 An `DataRatio` object that stores the results of `dataratio`.
 """
 struct DataRatio
     table::DataFrame
-    dataintervals::StructArray
+    dataintervals::StructArray{DataInterval}
 end
 
 """
@@ -99,3 +116,30 @@ function transform_datetime!(df::DataFrame, groupbycol;
     transform!(df, args => ByRow(fn) => groupbycol)
     select!(df, Not(args)) # remove args (:year, :month, ...)
 end
+
+
+"""
+`convert_arguments(DR::DataRatio)` returns `xs, ys, vs` for `heatmap!(ax, xs, ys, vs,...)`.
+This extends Makie `convert_arguments` methods for `DataRatio`.
+"""
+function SWCForecastBase.convert_arguments(DR::DataRatio)
+
+    iter_columns = pairs(eachcol(DR.table))
+
+    # y is index to column (which data/variable), x is index to row (which interval_id)
+    name_points = [colname => (x, y, v) for (y,(colname, colval)) in enumerate(iter_columns) for (x, v) in enumerate(colval)]
+
+    # ytick_label = [(y,name) for (y,(name, val)) in enumerate(iter_columns)]
+    # xtick_label = [(row.dtgroup, Dates.format(row.dt0, "u.")) for row in eachrow(dfranges)]
+
+
+    npts = name_points
+    xs = first.(last.(npts))       .|> Float64
+    ys = getindex.(last.(npts), 2) .|> Float64
+    vs = last.(last.(npts))        .|> Float64
+
+    return (xs, ys, vs)
+end
+
+
+SWCForecastBase.convert_arguments(P::DiscreteSurface, x::DataRatio) = convert_arguments(x)

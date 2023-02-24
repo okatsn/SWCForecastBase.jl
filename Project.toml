@@ -4,6 +4,7 @@ authors = ["okatsn <okatsn@gmail.com> and contributors"]
 version = "0.3.1"
 
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Impute = "f7bf1975-0170-51b9-8c5f-a992d46b9575"
@@ -25,6 +26,7 @@ StructArrays = "0.6.14"
 julia = "1.6"
 
 [extras]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 CompatHelperLocal = "5224ae11-6099-4aaa-941d-3aab004bd678"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
@@ -32,4 +34,4 @@ SWCDatasets = "92a3a819-b5fa-4251-b583-c8bfed228d45"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Documenter", "CompatHelperLocal", "Dates", "SWCDatasets"]
+test = ["Test", "Documenter", "CompatHelperLocal", "Dates", "SWCDatasets", "CairoMakie"]
