@@ -50,7 +50,7 @@ end
     name_points = [colname => (x, y, v) for (y,(colname, colval)) in enumerate(iter_columns) for (x, v) in enumerate(colval)]
 
     ytick_label = [(y,name) for (y,(name, val)) in enumerate(iter_columns)]
-    xtick_label = [(interval_id, Dates.format(dt0, "u.")) for (interval_id, dt0) in zip(DR.dataintervals.identifier, DR.dataintervals.from)]
+    xtick_label = [(interval_id, Dates.format(dt0, "d/u.")) for (interval_id, dt0) in zip(DR.dataintervals.identifier, DR.dataintervals.from)]
     f = Figure(; resolution=(800,600))
     ax = Axis(f[1,1])
     hmap = SWCForecastBase.heatmap!(ax, DR; colormap = "diverging_rainbow_bgymr_45_85_c67_n256")
