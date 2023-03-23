@@ -16,3 +16,6 @@ Add basic tree models
 
 ## v0.3.1
 Fix dependencies and update compat
+
+## v0.3.2
+`DataRatio` for `Makie`'s recipe for `dataratio` calculation per `DataInterval` and plot as `heatmap!`
