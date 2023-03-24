@@ -156,3 +156,13 @@ function convert_types(df, column_names_types)
     end
     return df
 end
+
+
+"""
+`T` is the datetime of `Y`.
+"""
+struct SeriesToSupervised
+    X
+    Y
+    T
+end

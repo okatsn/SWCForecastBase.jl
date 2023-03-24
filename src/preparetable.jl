@@ -19,7 +19,7 @@ struct ConfigPreprocess <: PrepareTableConfig
     preprocessing
     function ConfigPreprocess(;
         timeargs            = Cols(:year, :month, :day, :hour), # sort, group by, and combine according to the last
-        input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"windspeed"),
+        input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"windspeed", r"precipitation"), # FIXME: you need a precipmax! to ensure precipitation_max is generated
         target_features = Cols(r"soil_water_content"),
         preprocessing   = [take_hour_last, removeunresonables!, imputeinterp!],
         )
@@ -57,8 +57,10 @@ configs::Vector{<:PrepareTableConfig}
 mutable struct PrepareTable
     table::DataFrame
     configs::Vector{<:PrepareTableConfig}
+    state::Union{TrainTestState, Nothing}
+    sts::Union{SeriesToSupervised, Nothing}
     function PrepareTable(table)
-        new(table, PrepareTableConfig[])
+        new(table, PrepareTableConfig[], nothing, nothing)
     end
 end
 
@@ -104,6 +106,12 @@ generates `datetime` column by `PTC.timeargs`, `sort!` by `:datetime`, do `PTC.p
 function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
     transform!(PT.table, AsTable(PTC.timeargs) => ByRow(args -> DateTime(args...)) => :datetime)
     sort!(PT.table, :datetime)
+    select!(PT.table, :datetime, PTC.timeargs, PTC.input_features, PTC.target_features)
+    PT.state = Prepare((
+        timeargs        = PTC.timeargs,
+        input_features  = PTC.input_features,
+        target_features = PTC.target_features
+    )) # for later use
     PT.table = @chain(PT.table, PTC.preprocessing...)
     try
         Δt = PT.table.datetime |> diff |> unique |> only
@@ -130,15 +138,18 @@ end
 function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised) # TODO: not finished
     df = PT.table
     fullX, y0, t0 = series2supervised(
-        df[!, Cols(featureselector)]    => tpast,
-        df[!, Cols(targetselector)]     => tfuture,
-        df[!, [:datetime]]              => tfuture)
+        df[!, PT.state.input_features]  => PTC.shift_x,
+        df[!, PT.state.target_features] => PTC.shift_y,
+        df[!, [:datetime]]              => PTC.shift_y)
 
-    t0v = only(eachcol(t0))
-    x0v = eachindex(t0v) |> collect
-    TX = TimeAsX(x0v, t0v; check_approxid = true)
+    # t0v = only(eachcol(t0))
+    # x0v = eachindex(t0v) |> collect
+    # TX = TimeAsX(x0v, t0v; check_approxid = true)
+    PT.sts = SeriesToSupervised(fullX, y0, t0)
 
     push!(PT.configs, PTC)
+    PT.state = Train()
+
     return PT
     # return fullX, y0, TX
 end
