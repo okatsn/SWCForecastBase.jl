@@ -1,8 +1,8 @@
 abstract type PrepareTableConfig end
 
 struct ConfigSeriesToSupervised <: PrepareTableConfig
-    shift_x
-    shift_y
+    shift_x::Vector{<:Int}
+    shift_y::Vector{<:Int}
     function ConfigSeriesToSupervised(;
         shift_x         = [0, -6, -12, -24, -36, -48, -60, -72],
         shift_y         = [1],
@@ -11,69 +11,99 @@ struct ConfigSeriesToSupervised <: PrepareTableConfig
     end
 end
 
+
 struct ConfigPreprocess <: PrepareTableConfig
-    time
-    input_features
-    target_features
-    accumulates
+    timeargs::Cols
+    input_features::Cols
+    target_features::Cols
     preprocessing
     function ConfigPreprocess(;
-        time            = [:year, :month, :day, :hour], # sort, group by, and combine according to the last
+        timeargs            = Cols(:year, :month, :day, :hour), # sort, group by, and combine according to the last
         input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"windspeed"),
         target_features = Cols(r"soil_water_content"),
-        accumulates     = Dict("precipitation_max" => [1, 12, 24, 48, 36]),
         preprocessing   = [removeunresonables!, imputeinterp!],
         )
         new(
-            time,
+            timeargs,
             input_features,
             target_features,
-            accumulates,
             preprocessing,
         )
     end
 end
 
+struct ConfigAccumulate <: PrepareTableConfig
+    variables::Cols
+    intervals::Vector{<:Int}
+    unit # unit of intervals as appended string of the new column, e.g., day.
+    function ConfigAccumulate(; variables = Cols(:precipitation_max),
+                                intervals = [1, 12, 24, 48, 36],
+                                unit = ""
+        )
+        new(variables, intervals, unit)
+    end
+end
+
 struct PrepareTable
-    config::Vector{<:PrepareTableConfig}
     table::DataFrame
+    config::Vector{<:PrepareTableConfig}
     function PrepareTable(df::DataFrame, PTCs::PrepareTableConfig...)
         df = deepcopy(df)
         for PTC in PTCs
             preparetable!(df, PTC)
         end
-        new(PTCs, df)
+        new(df, PTCs)
     end
+end
+
+"""
+Default data processing:
+
+`PrepareTable(df::DataFrame) = PrepareTable(df, ConfigPreprocess(), ConfigAccumulate(), ConfigSeriesToSupervised())`
+"""
+function PrepareTable(df::DataFrame)
+    PrepareTable(df, ConfigPreprocess(), ConfigAccumulate(; unit="hr"), ConfigSeriesToSupervised())
 end
 
 
 function preparetable!(df, PTC::PrepareTableConfig)
-    return nothing # do nothing if the corresponding methods not created
+    @error "There is no corresponding method for $(typeof(PTC)) yet. Please create one."
+    # return nothing # do nothing if the corresponding methods not created
 end
 
+"""
+`preparetable!(df, PTC::ConfigPreprocess)`
+generates `datetime` column by `PTC.timeargs`, `sort!` by `:datetime`, do `PTC.preprocessing` in `@chain` and check if the table is continuous in time.
 
+This method will raise essential error, that `PTC::ConfigPreprocess` should be the first `arg` in `args` of `PrepareTable(df, args...)`.
+Otherwise, the succeeding processing such as `ConfigAccumulate` or `ConfigSeriesToSupervised` may give incorrect results without error.
+"""
 function preparetable!(df, PTC::ConfigPreprocess)
-    transform!(ari0, [:year, :month, :day, :hour] => ByRow((y,m,d,h) -> DateTime(y,m,d, h, 0, 0)) => :datetime)
-
-    all_precipstr = names(ari0, r"precipitation")
-
-    df = @chain ari0 begin
-        removeunreasonables!
-        imputeinterp!
-        filter!(:datetime => timeselector, _)
-        disallowmissing!
-        SWCForecastBase.addcol_accumulation!(_, all_precipstr, apd)
-    end
-
+    transform!(df, AsTable(PTC.timeargs) => ByRow(args -> DateTime(args...)) => :datetime)
+    sort!(df, :datetime)
+    df = @chain(df, PTC.preprocessing...)
+    # TODO: you didn't combine to lowest timeargs yet.
     try
         Δt = df.datetime |> diff |> unique |> get1var
     catch
-        @warn "The loaded data is not continuous in time."
-    end # make sure the data is continuous
-
+        @error "The loaded data is not continuous in time."
+    end
+    return df
 end
 
-function preparetable!(df, PTC::ConfigSeriesToSupervised)
+"""
+"""
+function preparetable!(df, PTC::ConfigAccumulate)
+    sfx(i) = "$i$(PTC.unit)"
+    apd = sfx.(PTC.intervals) .=> PTC.intervals # create a dictionary
+    for var in PTC.variables.cols
+        addcol_accumulation!(df, var, apd)
+    end
+    return df
+end
+
+
+function preparetable!(df, PTC::ConfigSeriesToSupervised) # TODO: not finished
     fullX, y0, t0 = series2supervised(
         df[!, Cols(featureselector)]    => tpast,
         df[!, Cols(targetselector)]     => tfuture,
