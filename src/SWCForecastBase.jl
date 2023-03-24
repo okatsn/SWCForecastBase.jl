@@ -9,6 +9,10 @@ export imputemean!, imputeinterp!, removeunreasonables!
 include("myimputation/checkmissnan.jl")
 export chknnm, isnnm, islnan
 
+using Chain
+include("combinegroup.jl")
+export combinegroup_allcols
+
 using ShiftedArrays
 include("series2supervised.jl")
 export series2supervised
@@ -26,7 +30,7 @@ export fstree, twofstree, manytrees
 
 using DataFrames
 include("preparetable.jl")
-export PrepareTable
+export PrepareTable, DefaultPrepareTable, preparetable!, ConfigAccumulate, ConfigPreprocess, ConfigSeriesToSupervised
 
 
 
