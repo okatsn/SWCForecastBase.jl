@@ -23,6 +23,13 @@ using MLJ
 include("mljmodels/treemodels.jl")
 export fstree, twofstree, manytrees
 
+
+using DataFrames
+include("preparetable.jl")
+export PrepareTable
+
+
+
 include("forplot/dataoverview.jl") # only for test
 
 using Dates, Statistics, DataFrames, ShiftedArrays, StructArrays
