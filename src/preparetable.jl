@@ -72,8 +72,9 @@ Given a `table::DataFrame` and `PTCs::PrepareTableConfig...`, `PrepareTable` run
     PrepareTable(df::DataFrame, ConfigPreprocess(), ConfigSeriesToSupervised())
 ```
 """
-function PrepareTable(df::DataFrame, PTCs::PrepareTableConfig...)
+function PrepareTable(df::DataFrame, PTC1::PrepareTableConfig, PTCs::PrepareTableConfig...)
     PT = PrepareTable(df)
+    preparetable!(PT, PTC1) # To prevent ERROR: StackOverflow due to the inner constructor PrepareTable(table)
     for PTC in PTCs
         preparetable!(PT, PTC)
     end
