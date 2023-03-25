@@ -9,6 +9,9 @@ export imputemean!, imputeinterp!, removeunreasonables!
 include("myimputation/checkmissnan.jl")
 export chknnm, isnnm, islnan
 
+include("pipeline.jl")
+export simplepipeline
+
 using Chain
 include("combinegroup.jl")
 export combinegroup_allcols
@@ -27,6 +30,7 @@ using MLJ
 include("mljmodels/treemodels.jl")
 export fstree, twofstree, manytrees
 
+include("traintest.jl")
 
 using DataFrames
 include("preparetable.jl")

@@ -21,7 +21,7 @@ struct ConfigPreprocess <: PrepareTableConfig
         timeargs            = Cols(:year, :month, :day, :hour), # sort, group by, and combine according to the last
         input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"windspeed", r"precipitation"), # FIXME: you need a precipmax! to ensure precipitation_max is generated
         target_features = Cols(r"soil_water_content"),
-        preprocessing   = [take_hour_last, removeunresonables!, imputeinterp!],
+        preprocessing   = [take_hour_last, removeunresonables!, imputeinterp!, precipmax!],
         )
         new(
             timeargs,
@@ -112,7 +112,8 @@ function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
         input_features  = PTC.input_features,
         target_features = PTC.target_features
     )) # for later use
-    PT.table = @chain(PT.table, PTC.preprocessing...)
+    # PT.table = @chain(PT.table, PTC.preprocessing...) # This will fail
+    PT.table = simplepipeline(PT.table, PTC.preprocessing...)
     try
         Δt = PT.table.datetime |> diff |> unique |> only
     catch
@@ -135,7 +136,7 @@ function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
 end
 
 
-function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised) # TODO: not finished
+function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
     df = PT.table
     fullX, y0, t0 = series2supervised(
         df[!, PT.state.input_features]  => PTC.shift_x,
