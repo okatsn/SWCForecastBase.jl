@@ -11,7 +11,7 @@ function imputemean!(df)
     _replacenanbymissing!(df) # make all literal nan be missing
     _dealwithallmissingby!(df, 999) # if a column is all missing, make it all 999
     Impute.substitute!(df; statistic=mean) # impute missing
-    disallowmissing!(df) # sadly, disallowmissing! does not support subdataframe (e.g., df1 = @view df1[:, Not(:datetime)]; disallowmissing!(df1))
+    # disallowmissing!(df) # sadly, disallowmissing! does not support subdataframe (e.g., df1 = @view df1[:, Not(:datetime)]; disallowmissing!(df1))
 end
 
 

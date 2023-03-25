@@ -21,7 +21,7 @@ struct ConfigPreprocess <: PrepareTableConfig
         timeargs            = Cols(:year, :month, :day, :hour), # sort, group by, and combine according to the last
         input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"windspeed", r"precipitation"), # FIXME: you need a precipmax! to ensure precipitation_max is generated
         target_features = Cols(r"soil_water_content"),
-        preprocessing   = [take_hour_last, removeunresonables!, imputeinterp!, precipmax!],
+        preprocessing   = [take_hour_last, removeunreasonables!, imputeinterp!, disallowmissing!, precipmax!],
         )
         new(
             timeargs,
@@ -84,10 +84,37 @@ end
 """
 Default data processing:
 
-`DefaultPrepareTable(df::DataFrame) = PrepareTable(df, ConfigPreprocess(), ConfigAccumulate(), ConfigSeriesToSupervised())`
+`PrepareTableDefault(df::DataFrame) = PrepareTable(df, ConfigPreprocess(), ConfigAccumulate(), ConfigSeriesToSupervised())`
 """
-function DefaultPrepareTable(df::DataFrame)
+function PrepareTableDefault(df::DataFrame)
     PrepareTable(df, ConfigPreprocess(), ConfigAccumulate(; unit="hr"), ConfigSeriesToSupervised())
+end
+
+function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
+    # See this post for good indentation of show:
+    # https://discourse.julialang.org/t/get-fieldnames-and-values-of-struct-as-namedtuple/8991/2
+    df = PT.table
+    println(io, "PrepareTable")
+    println(io, "table:   $(nrow(df)) by $(ncol(df)) `$(typeof(df))`")
+    println(io, "configs: ")
+    indent = get(io, :indent, 0)
+    for config in PT.configs
+        show(IOContext(io, :indent => indent +4), mime, config)
+        println(io, "")
+    end
+    println(io, "state:   $(PT.state)")
+    println(io, "sts:")
+    show(IOContext(io, :indent => indent +4), mime, PT.sts)
+end
+
+function Base.show(io::IO, PTC::PrepareTableConfig)
+    fnames = fieldnames(typeof(PTC))
+    println(io, ' '^get(io, :indent, 0), string(typeof(PTC)))
+    for nm in fnames
+        str = string(getfield(PTC, nm))
+        # str = str[1:minimum([30, length(str)])]
+        println(io, ' '^(get(io, :indent, 0)+4), "$(nm): ", str)
+    end
 end
 
 
@@ -130,7 +157,7 @@ function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
     sfx(i) = "$i$(PTC.unit)"
     apd = Dict(sfx.(PTC.intervals) .=> PTC.intervals) # create a dictionary
     for var in PTC.variables.cols
-        addcol_accumulation!(PT.table, var, apd)
+        addcol_accumulation!(PT.table, [var], apd)
     end
     push!(PT.configs, PTC)
     return PT
@@ -140,8 +167,8 @@ end
 function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
     df = PT.table
     fullX, y0, t0 = series2supervised(
-        df[!, PT.state.input_features]  => PTC.shift_x,
-        df[!, PT.state.target_features] => PTC.shift_y,
+        df[!, PT.state.args.input_features]  => PTC.shift_x,
+        df[!, PT.state.args.target_features] => PTC.shift_y,
         df[!, [:datetime]]              => PTC.shift_y)
 
     # t0v = only(eachcol(t0))

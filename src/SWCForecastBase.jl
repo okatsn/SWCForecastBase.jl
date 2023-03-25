@@ -34,7 +34,7 @@ include("traintest.jl")
 
 using DataFrames
 include("preparetable.jl")
-export PrepareTable, DefaultPrepareTable, preparetable!, ConfigAccumulate, ConfigPreprocess, ConfigSeriesToSupervised
+export PrepareTable, PrepareTableDefault, preparetable!, ConfigAccumulate, ConfigPreprocess, ConfigSeriesToSupervised
 
 
 
