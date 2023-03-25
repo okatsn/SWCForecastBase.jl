@@ -41,7 +41,7 @@ export PrepareTable, DefaultPrepareTable, preparetable!, ConfigAccumulate, Confi
 include("forplot/dataoverview.jl") # only for test
 
 using Dates, Statistics, DataFrames, ShiftedArrays, StructArrays
-import CairoMakie
+using CairoMakie
 include("forplot/dataratio.jl")
 export dataratio, DataRatio, transform_datetime!
 end

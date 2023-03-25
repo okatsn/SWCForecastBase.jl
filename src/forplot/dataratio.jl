@@ -130,7 +130,7 @@ DR = DataRatio(ari0, Month(1), SWCForecastBase.islnan)
 DR |> convert_arguments |> x -> heatmap(x...)
 ```
 """
-function convert_arguments(DR::DataRatio)
+function CairoMakie.convert_arguments(DR::DataRatio)
 
     iter_columns = pairs(eachcol(DR.table))
 
@@ -164,7 +164,7 @@ Colorbar(f[1, 2], hmap, label = "missing data rate")
 See `DataRatio` and `SWCForecastBase.convert_arguments`.
 
 """
-function heatmap!(ax, DR::DataRatio; kwargs...)
+function CairoMakie.heatmap!(ax, DR::DataRatio; kwargs...)
     hmap = CairoMakie.heatmap!(ax, convert_arguments(DR)...; kwargs...)
     ytick_label = DR.table |> names
     xlabels = DR.dataintervals.from |> dt -> Dates.format.(dt, "d/u.")
