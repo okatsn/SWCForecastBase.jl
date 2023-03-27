@@ -36,14 +36,16 @@ export fstree, twofstree, manytrees
 # # Prepare the table
 
 using DataFrames
-include("preparetable0.jl")
-include("preparetable.jl")
+include("preparetable/briefinfo.jl")
+include("preparetable/preparetable0.jl")
+include("preparetable/preparetable.jl")
+
 export PrepareTable, PrepareTableDefault, preparetable!, ConfigAccumulate, ConfigPreprocess, ConfigSeriesToSupervised
 
 # # Train and test
 
 using OkTableTools
-include("traintest.jl")
+include("preparetable/traintest.jl")
 export traintest!, train!, test!
 
 # # Plotting
