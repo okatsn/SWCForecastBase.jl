@@ -58,7 +58,7 @@ mutable struct PrepareTable
     table::DataFrame
     configs::Vector{<:PrepareTableConfig}
     state::Union{TrainTestState, Nothing}
-    sts::Union{SeriesToSupervised, Nothing}
+    supervised_tables::Union{SeriesToSupervised, Nothing}
     function PrepareTable(table)
         new(table, PrepareTableConfig[], nothing, nothing)
     end
@@ -103,8 +103,8 @@ function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
         println(io, "")
     end
     println(io, "state:   $(PT.state)")
-    println(io, "sts:")
-    show(IOContext(io, :indent => indent +4), mime, PT.sts)
+    println(io, "supervised_tables:")
+    show(IOContext(io, :indent => indent +4), mime, PT.supervised_tables)
 end
 
 function Base.show(io::IO, PTC::PrepareTableConfig)
@@ -174,7 +174,7 @@ function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
     # t0v = only(eachcol(t0))
     # x0v = eachindex(t0v) |> collect
     # TX = TimeAsX(x0v, t0v; check_approxid = true)
-    PT.sts = SeriesToSupervised(fullX, y0, t0)
+    PT.supervised_tables = SeriesToSupervised(fullX, y0, t0)
 
     push!(PT.configs, PTC)
     PT.state = Train()

@@ -19,3 +19,17 @@ Fix dependencies and update compat
 
 ## v0.3.2
 `DataRatio` for `Makie`'s recipe for `dataratio` calculation per `DataInterval` and plot as `heatmap!`
+
+## v0.4.0-DEV
+`PrepareTable` and associated data-preparing API, with `preparetable!` with `ConfigPreprocess`, `ConfigAccumulate` and `ConfigSeriesToSupervised`. With:
+- `table::DataFrame`
+- `configs::Vector{<:PrepareTableConfig}`
+- `state::Union{TrainTestState, Nothing}`
+- `supervised_tables::Union{SeriesToSupervised, Nothing}`
+
+Preprocess utilities
+- `precipmax!`
+- `take_hour_last`
+
+Change in behavior
+- `imputemean!` does not by default do `disallowmissing!`
