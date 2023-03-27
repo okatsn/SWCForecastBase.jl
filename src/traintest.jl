@@ -2,25 +2,27 @@ function traintest!(PT::PrepareTable)
 
 end
 
-function train!(PT::PrepareTable; train_before = :auto, model = manytrees())
+function train!(PT::PrepareTable; train_before = :auto, model = manytrees(), max_train_point = 24*120)
     if train_before == :auto
         train_before = now()
     end
 
-    id0 = 1
-    row, id1 = nearestrow(PT.supervised_tables.T, Cols(r"\Adatetime"), train_before)
-    X = PT.supervised_tables.X[id0:id1]
-    Y = PT.supervised_tables.Y[id0:id1]
-    t = PT.supervised_tables.T[id0:id1] |> eachcol |> only
-    machs = _create_machines(model, t, X, Y)
+    _, id1s = sortbydist(PT.supervised_tables.T, Cols(r"\Adatetime"), [train_before]) # you can only have exactly one column started with "datetime"
+    id1 = first(id1s)
+    id0 = maximum([1, id1 - max_train_point])
+
+    X = PT.supervised_tables.X[id0:id1, :]
+    Y = PT.supervised_tables.Y[id0:id1, :]
+    t = PT.supervised_tables.T[id0:id1, :] |> eachcol |> only
+    machs = _create_machines(model, X, Y)
     fit!.(machs)
-    PT.state = Train((machines = machs,))
+    PT.state = Train((machines = machs, X = X, Y = Y, t = t))
     return PT
 end
 
 # TODO: future work: the learning network of 0.19.1:
 # https://alan-turing-institute.github.io/MLJ.jl/stable/learning_networks/
-function _create_machines(model, t, X, Y)
+function _create_machines(model, X, Y)
     machs = [machine(model, X, y) for y in eachcol(Y)]
 end
 
