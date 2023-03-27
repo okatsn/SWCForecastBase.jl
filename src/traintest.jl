@@ -1,17 +1,13 @@
-abstract type TrainTestState end
 
-mutable struct Train <: TrainTestState
-    args::NamedTuple
+
+function traintest!(PT::PrepareTable)
+
 end
 
-Train() = Train(NamedTuple())
+function train!(PT::PrepareTable; train_before = :auto)
 
-mutable struct Test <: TrainTestState
-    args::NamedTuple
 end
-Test() = Test(NamedTuple())
 
-mutable struct Prepare <: TrainTestState
-    args::NamedTuple
+function test(PT::PrepareTable; test_after = :auto, test_numpoints = 240)
+
 end
-Prepare() = Prepare(NamedTuple())
