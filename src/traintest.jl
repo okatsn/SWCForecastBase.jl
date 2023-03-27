@@ -26,20 +26,27 @@ function _create_machines(model, X, Y)
     machs = [machine(model, X, y) for y in eachcol(Y)]
 end
 
-function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 240)
+function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
     if test_after == :auto
        test_after = now()
     end
-    row, id0 = nearestrow(PT.supervised_tables.T, Cols(r"\Adatetime"), test_after)
-    X = PT.supervised_tables.X[id0:(id0+test_numpoints)]
-    Y = PT.supervised_tables.Y[id0:(id0+test_numpoints)]
-    t = PT.supervised_tables.T[id0:(id0+test_numpoints)] |> eachcol |> only
+    _, id0s = sortbydist(PT.supervised_tables.T, Cols(r"\Adatetime"), [test_after])
+    id0 = first(id0s)
+    id1 = minimum([id0+test_numpoints, nrow(PT.supervised_tables.T)])
 
-    machs = _get_machines(PT.state)
+    Xt = PT.supervised_tables.X[id0:id1,:]
+    Yt = PT.supervised_tables.Y[id0:id1,:]
+    tt = PT.supervised_tables.T[id0:id1,:] |> eachcol |> only
 
-    for (mach, y) in zip(machs, eachcol(Y))
-        yhat = predict(mach, X, only(y))
+    machs = PT.state.args.machines
+
+    Yhat = DataFrame()
+    for (mach, (coly, y)) in zip(machs, pairs(eachcol(Yt)))
+        yhat = predict(mach, Xt)
+        insertcols!(Yhat, coly => yhat)
     end
+    PT.state = Test((machines = machs, X = Xt, Y = Yt, t = tt, Y_pred = Yhat))
+    return PT
 end
 
 _get_machines(otherwise) = @error "It is not trained."
