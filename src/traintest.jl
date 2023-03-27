@@ -16,7 +16,7 @@ function train!(PT::PrepareTable; train_before = :auto, model = manytrees(), max
     t = PT.supervised_tables.T[id0:id1, :] |> eachcol |> only
     machs = _create_machines(model, X, Y)
     fit!.(machs)
-    PT.state = Train((machines = machs, X = X, Y = Y, t = t))
+    PT.status = Train((machines = machs, X = X, Y = Y, t = t))
     return PT
 end
 
@@ -38,14 +38,14 @@ function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
     Yt = PT.supervised_tables.Y[id0:id1,:]
     tt = PT.supervised_tables.T[id0:id1,:] |> eachcol |> only
 
-    machs = PT.state.args.machines
+    machs = PT.status.args.machines
 
     Yhat = DataFrame()
     for (mach, (coly, y)) in zip(machs, pairs(eachcol(Yt)))
         yhat = predict(mach, Xt)
         insertcols!(Yhat, coly => yhat)
     end
-    PT.state = Test((machines = machs, X = Xt, Y = Yt, t = tt, Y_pred = Yhat))
+    PT.status = Test((machines = machs, X = Xt, Y = Yt, t = tt, Y_pred = Yhat))
     return PT
 end
 

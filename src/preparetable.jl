@@ -15,7 +15,7 @@ function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
     transform!(PT.table, AsTable(PTC.timeargs) => ByRow(args -> DateTime(args...)) => :datetime)
     sort!(PT.table, :datetime)
     select!(PT.table, :datetime, PTC.timeargs, PTC.input_features, PTC.target_features)
-    PT.state = Prepare((
+    PT.status = Prepare((
         timeargs        = PTC.timeargs,
         input_features  = PTC.input_features,
         target_features = PTC.target_features
@@ -47,8 +47,8 @@ end
 function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
     df = PT.table
     fullX, y0, t0 = series2supervised(
-        df[!, PT.state.args.input_features]  => PTC.shift_x,
-        df[!, PT.state.args.target_features] => PTC.shift_y,
+        df[!, PT.status.args.input_features]  => PTC.shift_x,
+        df[!, PT.status.args.target_features] => PTC.shift_y,
         df[!, [:datetime]]              => PTC.shift_y)
 
     # t0v = only(eachcol(t0))
@@ -57,7 +57,6 @@ function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
     PT.supervised_tables = SeriesToSupervised(fullX, y0, t0)
 
     push!(PT.configs, PTC)
-    PT.state = Train()
 
     return PT
     # return fullX, y0, TX

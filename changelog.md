@@ -24,7 +24,7 @@ Fix dependencies and update compat
 `PrepareTable` and associated data-preparing API, with `preparetable!` with `ConfigPreprocess`, `ConfigAccumulate` and `ConfigSeriesToSupervised`. With:
 - `table::DataFrame`
 - `configs::Vector{<:PrepareTableConfig}`
-- `state::Union{TrainTestState, Nothing}`
+- `status::Union{TrainTestState, Nothing}`
 - `supervised_tables::Union{SeriesToSupervised, Nothing}`
 
 Preprocess utilities

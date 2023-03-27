@@ -104,7 +104,7 @@ configs::Vector{<:PrepareTableConfig}
 mutable struct PrepareTable
     table::DataFrame
     configs::Vector{<:PrepareTableConfig}
-    state::Union{TrainTestState, Nothing}
+    status::Union{TrainTestState, Nothing}
     supervised_tables::Union{SeriesToSupervised, Nothing}
     function PrepareTable(table)
         new(table, PrepareTableConfig[], nothing, nothing)
@@ -149,9 +149,9 @@ function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
         show(IOContext(io, :indent => indent +4), mime, config)
         println(io, "")
     end
-    println(io, "state: ")
+    println(io, "status: ")
     indent = get(io, :indent, 0)
-    println(IOContext(io, :indent => indent +4), "$(PT.state)")
+    println(IOContext(io, :indent => indent +4), "$(PT.status)")
     println(io, "supervised_tables:")
     show(IOContext(io, :indent => indent +4), mime, PT.supervised_tables)
 end
