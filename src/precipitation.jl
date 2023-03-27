@@ -68,3 +68,11 @@ function cccount(ts)
         end
         return nts
 end
+
+
+"""
+`precipmax!(df::DataFrame)` creates `precipitation_max` by maximize `Cols(r"\\Aprecipitation")` `ByRow`.
+"""
+function precipmax!(df::DataFrame)
+    transform!(df, AsTable(Cols(r"\Aprecipitation")) => ByRow(maximum) => :precipitation_max)
+end

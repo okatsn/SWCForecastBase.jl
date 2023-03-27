@@ -5,6 +5,7 @@ version = "0.3.2"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Impute = "f7bf1975-0170-51b9-8c5f-a992d46b9575"
@@ -18,6 +19,7 @@ StructArrays = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
 
 [compat]
 CairoMakie = "0.10.2"
+Chain = "0.5.0"
 DataFrames = "1.5.0"
 Impute = "0.6.10"
 MLJ = "0.19.1"

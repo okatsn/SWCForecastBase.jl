@@ -156,3 +156,20 @@ function convert_types(df, column_names_types)
     end
     return df
 end
+
+
+"""
+`T` is the datetime of `Y`.
+"""
+struct SeriesToSupervised
+    X
+    Y
+    T
+end
+
+function Base.show(io::IO, sts::SeriesToSupervised)
+    indent = get(io, :indent, 0)
+    println(io,' '^indent, "input features: $(nrow(sts.X)) by $(ncol(sts.X)) `$(typeof(sts.X))`.")
+    println(io,' '^indent, "target features: $(nrow(sts.Y)) by $(ncol(sts.Y)) `$(typeof(sts.Y))`.")
+    println(io,' '^indent, "time: $(extrema(only(eachcol(sts.T))))")
+end

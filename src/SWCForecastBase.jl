@@ -9,6 +9,13 @@ export imputemean!, imputeinterp!, removeunreasonables!
 include("myimputation/checkmissnan.jl")
 export chknnm, isnnm, islnan
 
+include("pipeline.jl")
+export simplepipeline
+
+using Chain
+include("combinegroup.jl")
+export combinegroup_allcols
+
 using ShiftedArrays
 include("series2supervised.jl")
 export series2supervised
@@ -23,17 +30,18 @@ using MLJ
 include("mljmodels/treemodels.jl")
 export fstree, twofstree, manytrees
 
+include("traintest.jl")
 
 using DataFrames
 include("preparetable.jl")
-export PrepareTable
+export PrepareTable, PrepareTableDefault, preparetable!, ConfigAccumulate, ConfigPreprocess, ConfigSeriesToSupervised
 
 
 
 include("forplot/dataoverview.jl") # only for test
 
 using Dates, Statistics, DataFrames, ShiftedArrays, StructArrays
-import CairoMakie
+using CairoMakie
 include("forplot/dataratio.jl")
 export dataratio, DataRatio, transform_datetime!
 end
