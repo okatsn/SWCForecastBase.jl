@@ -122,7 +122,7 @@ function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
         show(IOContext(io, :indent => indent +4), mime, config)
         println(io, "")
     end
-    println(io, "state:   $(PT.state)")
+    println(io, "state:   $(typeof(PT.state))(...)")
     println(io, "supervised_tables:")
     show(IOContext(io, :indent => indent +4), mime, PT.supervised_tables)
 end
