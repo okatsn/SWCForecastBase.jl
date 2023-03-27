@@ -48,6 +48,10 @@ using OkTableTools
 include("preparetable/traintest.jl")
 export traintest!, train!, test!
 
+using CSV, Random
+include("preparetable/save.jl")
+export save
+
 # # Plotting
 
 include("forplot/dataoverview.jl") # only for test
