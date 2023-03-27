@@ -11,12 +11,13 @@ function train!(PT::PrepareTable; train_before = :auto, model = manytrees(), max
     id1 = first(id1s)
     id0 = maximum([1, id1 - max_train_point])
 
-    X = PT.supervised_tables.X[id0:id1, :]
-    Y = PT.supervised_tables.Y[id0:id1, :]
-    t = PT.supervised_tables.T[id0:id1, :] |> eachcol |> only
+    X = @view PT.supervised_tables.X[id0:id1, :]
+    Y = @view PT.supervised_tables.Y[id0:id1, :]
+    t = @view only(eachcol(PT.supervised_tables.T))[id0:id1]
     machs = _create_machines(model, X, Y)
     fit!.(machs)
     PT.status = Train((machines = machs, X = X, Y = Y, t = t))
+    PT.cache.train = PT.status
     return PT
 end
 
@@ -34,9 +35,9 @@ function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
     id0 = first(id0s)
     id1 = minimum([id0+test_numpoints, nrow(PT.supervised_tables.T)])
 
-    Xt = PT.supervised_tables.X[id0:id1,:]
-    Yt = PT.supervised_tables.Y[id0:id1,:]
-    tt = PT.supervised_tables.T[id0:id1,:] |> eachcol |> only
+    Xt = @view PT.supervised_tables.X[id0:id1,:]
+    Yt = @view PT.supervised_tables.Y[id0:id1,:]
+    tt = @view only(eachcol(PT.supervised_tables.T))[id0:id1]
 
     machs = PT.status.args.machines
 
@@ -46,6 +47,7 @@ function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
         insertcols!(Yhat, coly => yhat)
     end
     PT.status = Test((machines = machs, X = Xt, Y = Yt, t = tt, Y_pred = Yhat))
+    PT.cache.test = PT.status
     return PT
 end
 

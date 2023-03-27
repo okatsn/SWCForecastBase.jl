@@ -24,7 +24,11 @@ function Base.show(io::IO, tts::TrainTestState)
     end
 end
 
-
+mutable struct Cache
+    prepare::Prepare
+    train::Train
+    test::Test
+end
 
 
 abstract type PrepareTableConfig end
@@ -88,8 +92,15 @@ mutable struct PrepareTable
     configs::Vector{<:PrepareTableConfig}
     status::Union{TrainTestState, Nothing}
     supervised_tables::Union{SeriesToSupervised, Nothing}
+    cache::Cache
     function PrepareTable(table)
-        new(table, PrepareTableConfig[], nothing, nothing)
+        new(table, PrepareTableConfig[], nothing, nothing,
+            Cache(
+                Prepare(),
+                Train(),
+                Test()
+            )
+        )
     end
 end
 
@@ -132,10 +143,15 @@ function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
         println(io, "")
     end
     println(io, "status: ")
-    indent = get(io, :indent, 0)
+    # indent = get(io, :indent, 0)
     println(IOContext(io, :indent => indent +4), "$(PT.status)")
     println(io, "supervised_tables:")
     show(IOContext(io, :indent => indent +4), mime, PT.supervised_tables)
+    println(io, "cache: ")
+    # indent = get(io, :indent, 0)
+    for fnm in fieldnames(Cache)
+        println(IOContext(io, :indent => indent +4), "$(getfield(PT.cache, fnm))")
+    end
 end
 
 function Base.show(io::IO, PTC::PrepareTableConfig)

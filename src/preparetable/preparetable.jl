@@ -20,6 +20,7 @@ function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
         input_features  = PTC.input_features,
         target_features = PTC.target_features
     )) # for later use
+    PT.cache.prepare = PT.status
     # PT.table = @chain(PT.table, PTC.preprocessing...) # This will fail
     PT.table = simplepipeline(PT.table, PTC.preprocessing...)
     try
