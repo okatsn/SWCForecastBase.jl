@@ -16,6 +16,33 @@ mutable struct Prepare <: TrainTestState
 end
 Prepare() = Prepare(NamedTuple())
 
+function Base.show(io::IO, tts::TrainTestState)
+    indent = get(io, :indent, 0)
+    println(io,' '^(indent+4), "$(typeof(tts)):")
+    for (k, v) in pairs(tts.args)
+        println(io,' '^(indent+8), "$k: $(_brief_info(v))")
+    end
+end
+
+function _brief_info(otherwise)
+    str = string(otherwise)
+    lens = length(str)
+    str[1:minimum([lens, 50])]
+end
+_brief_info(df::AbstractDataFrame) = "$(nrow(df)) by $(ncol(df)) `$(typeof(df))`"
+function _brief_info(v::Vector)
+    str = string(v)
+    if length(str) > 40
+        str = str[1:40]*"..."
+    end
+    "$(length(v)) elements of vector `$str`."
+end
+
+function _brief_info(v::Vector{<:TimeType})
+    t0, t1 = extrema(v)
+    "[$t0, ..., $t1]"
+end
+
 
 
 abstract type PrepareTableConfig end
@@ -115,14 +142,16 @@ function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
     # https://discourse.julialang.org/t/get-fieldnames-and-values-of-struct-as-namedtuple/8991/2
     df = PT.table
     println(io, "PrepareTable")
-    println(io, "table:   $(nrow(df)) by $(ncol(df)) `$(typeof(df))`")
+    println(io, "table:   $(_brief_info(df))`")
     println(io, "configs: ")
     indent = get(io, :indent, 0)
     for config in PT.configs
         show(IOContext(io, :indent => indent +4), mime, config)
         println(io, "")
     end
-    println(io, "state:   $(typeof(PT.state))(...)")
+    println(io, "state: ")
+    indent = get(io, :indent, 0)
+    println(IOContext(io, :indent => indent +4), "$(PT.state)")
     println(io, "supervised_tables:")
     show(IOContext(io, :indent => indent +4), mime, PT.supervised_tables)
 end
