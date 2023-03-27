@@ -1,8 +1,9 @@
-function traintest!(PT::PrepareTable)
-
-end
-
-function train!(PT::PrepareTable; train_before = :auto, model = manytrees(), max_train_point = 24*120)
+function train!(PT::PrepareTable;
+        train_before = :auto,
+        model = manytrees(),
+        max_train_point = 24*120,
+        dummykwargs...
+    )
     if train_before == :auto
         train_before = now()
     end
@@ -27,7 +28,7 @@ function _create_machines(model, X, Y)
     machs = [machine(model, X, y) for y in eachcol(Y)]
 end
 
-function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
+function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480, dummykwargs...)
     if test_after == :auto
        test_after = now()
     end
@@ -51,7 +52,12 @@ function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
     return PT
 end
 
-_get_machines(otherwise) = @error "It is not trained."
-function _get_machines(Pt_state::Union{Train, Test})
-    PT_state.machines
+# _get_machines(otherwise) = @error "It is not trained."
+# function _get_machines(Pt_state::Union{Train, Test})
+#     PT_state.machines
+# end
+
+function traintest!(PT::PrepareTable; kwargs...)
+    train!(PT; kwargs...)
+    test!(PT; kwargs...)
 end
