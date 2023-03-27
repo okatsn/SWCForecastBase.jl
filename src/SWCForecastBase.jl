@@ -44,7 +44,7 @@ export PrepareTable, PrepareTableDefault, preparetable!, ConfigAccumulate, Confi
 
 using OkTableTools
 include("traintest.jl")
-
+export traintest!, train!, test!
 
 # # Plotting
 
