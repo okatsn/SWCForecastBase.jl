@@ -21,7 +21,7 @@ end
 
 """
 Without specifying the parent folder `dir0`,
-a folder with randomstring will be generated.
+a folder of name of randomstring will be created as the parent folder.
 
 # Example
 ```julia
