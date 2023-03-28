@@ -10,6 +10,10 @@ train!(PT::PrepareTable;
         max_train_point = 24*120
     )
 ```
+
+- `train_before`: The `DateTime` or `Date` before which the data is used for training; if `:auto`, `train_before = now()`.
+- `model`: The model; it can be any `MLJ` model.
+- `max_train_point`: from `train_before` how many data points (number of rows) to be included for model training.
 """
 function train!(PT::PrepareTable;
         train_before = :auto,
@@ -47,6 +51,10 @@ end
 ```julia
 test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
 ```
+
+- `test_after`: the `DateTime` or `Date` after which model prediction (model testing stage) starts. If `:auto`, `test_after = now()`.
+- `test_numpoints`: the number of data points in the "future" to be tested.
+
 """
 function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480, dummykwargs...)
     if test_after == :auto
@@ -78,7 +86,7 @@ end
 # end
 
 """
-`traintest!(PT::PrepareTable; kwargs...)` do `train!` then `test!`, taking exactly the same keyword arguments as `train!` or `test!`.
+`traintest!(PT::PrepareTable; kwargs...)` do `train!` then `test!`, accepts all keyword arguments that `train!` or `test!` could have.
 """
 function traintest!(PT::PrepareTable; kwargs...)
     train!(PT; kwargs...)
