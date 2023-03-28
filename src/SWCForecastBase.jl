@@ -48,7 +48,7 @@ using OkTableTools
 include("preparetable/traintest.jl")
 export traintest!, train!, test!
 
-using CSV, Random
+using CSV, Random, FileTrees
 include("preparetable/save.jl")
 export save
 

@@ -15,11 +15,13 @@ function save(PT::PrepareTable, dir0)
         save(tts, targetdir)
         # end
     end
+    println("Results saved as the followings: ")
+    show(FileTree(dir0))
 end
 
 """
 Without specifying the parent folder `dir0`,
-a folder with randomstring will be generated.
+a folder of name of randomstring will be created as the parent folder.
 
 # Example
 ```julia
@@ -32,13 +34,16 @@ function save(PT::PrepareTable)
     save(PT, dir0)
 end
 
-_save(targetdir, k, v) = nothing
-
 function save(tts::TrainTestState, targetdir)
+    # targetpaths = String[]
     for (k, v) in pairs(tts.args)
-        _save(targetdir, k, v)
+        tp = _save(targetdir, k, v)
+        # ifelse(isnothing(tp), nothing, push!(targetpaths, tp))
     end
+    # return targetpaths
 end
+
+_save(targetdir, k, v) = nothing # do nothing if v is not in the followings.
 
 
 function _save(targetdir, k, v::AbstractDataFrame)
