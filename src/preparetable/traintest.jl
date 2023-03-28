@@ -1,3 +1,16 @@
+"""
+Training with `PrepareTable`.
+
+# Example
+
+```julia
+train!(PT::PrepareTable;
+        train_before = :auto,
+        model = manytrees(),
+        max_train_point = 24*120
+    )
+```
+"""
 function train!(PT::PrepareTable;
         train_before = :auto,
         model = manytrees(),
@@ -28,6 +41,13 @@ function _create_machines(model, X, Y)
     machs = [machine(model, X, y) for y in eachcol(Y)]
 end
 
+"""
+# Example
+
+```julia
+test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
+```
+"""
 function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480, dummykwargs...)
     if test_after == :auto
        test_after = now()
@@ -57,6 +77,9 @@ end
 #     PT_state.machines
 # end
 
+"""
+`traintest!(PT::PrepareTable; kwargs...)` do `train!` then `test!`, taking exactly the same keyword arguments as `train!` or `test!`.
+"""
 function traintest!(PT::PrepareTable; kwargs...)
     train!(PT; kwargs...)
     test!(PT; kwargs...)
