@@ -20,11 +20,11 @@ Fix dependencies and update compat
 ## v0.3.2
 `DataRatio` for `Makie`'s recipe for `dataratio` calculation per `DataInterval` and plot as `heatmap!`
 
-## v0.4.0-DEV
+## v0.4.0
 `PrepareTable` and associated data-preparing API, with `preparetable!` with `ConfigPreprocess`, `ConfigAccumulate` and `ConfigSeriesToSupervised`. With:
 - `table::DataFrame`
 - `configs::Vector{<:PrepareTableConfig}`
-- `state::Union{TrainTestState, Nothing}`
+- `status::Union{TrainTestState, Nothing}`
 - `supervised_tables::Union{SeriesToSupervised, Nothing}`
 
 Preprocess utilities
@@ -33,3 +33,8 @@ Preprocess utilities
 
 Change in behavior
 - `imputemean!` does not by default do `disallowmissing!`
+
+Workflow overview:
+- `PrepareTable`
+- `traintest!`
+- `save`

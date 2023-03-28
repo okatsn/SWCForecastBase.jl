@@ -169,7 +169,7 @@ end
 
 function Base.show(io::IO, sts::SeriesToSupervised)
     indent = get(io, :indent, 0)
-    println(io,' '^indent, "input features: $(nrow(sts.X)) by $(ncol(sts.X)) `$(typeof(sts.X))`.")
-    println(io,' '^indent, "target features: $(nrow(sts.Y)) by $(ncol(sts.Y)) `$(typeof(sts.Y))`.")
-    println(io,' '^indent, "time: $(extrema(only(eachcol(sts.T))))")
+    println(io,' '^indent, "input features: $(_brief_info(sts.X)).")
+    println(io,' '^indent, "target features: $(_brief_info(sts.Y)).")
+    println(io,' '^indent, "time: $(_brief_info(only(eachcol(sts.T))))")
 end

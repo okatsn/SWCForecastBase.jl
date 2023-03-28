@@ -1,3 +1,36 @@
+abstract type TrainTestState end
+
+mutable struct Train <: TrainTestState
+    args::NamedTuple
+end
+
+Train() = Train(NamedTuple())
+
+mutable struct Test <: TrainTestState
+    args::NamedTuple
+end
+Test() = Test(NamedTuple())
+
+mutable struct Prepare <: TrainTestState
+    args::NamedTuple
+end
+Prepare() = Prepare(NamedTuple())
+
+function Base.show(io::IO, tts::TrainTestState)
+    indent = get(io, :indent, 0)
+    println(io,' '^(indent+4), "$(typeof(tts)):")
+    for (k, v) in pairs(tts.args)
+        println(io,' '^(indent+8), "$k: $(_brief_info(v))")
+    end
+end
+
+mutable struct Cache
+    prepare::Prepare
+    train::Train
+    test::Test
+end
+
+
 abstract type PrepareTableConfig end
 
 struct ConfigSeriesToSupervised <: PrepareTableConfig
@@ -57,10 +90,17 @@ configs::Vector{<:PrepareTableConfig}
 mutable struct PrepareTable
     table::DataFrame
     configs::Vector{<:PrepareTableConfig}
-    state::Union{TrainTestState, Nothing}
+    status::Union{TrainTestState, Nothing}
     supervised_tables::Union{SeriesToSupervised, Nothing}
+    cache::Cache
     function PrepareTable(table)
-        new(table, PrepareTableConfig[], nothing, nothing)
+        new(table, PrepareTableConfig[], nothing, nothing,
+            Cache(
+                Prepare(),
+                Train(),
+                Test()
+            )
+        )
     end
 end
 
@@ -95,16 +135,23 @@ function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
     # https://discourse.julialang.org/t/get-fieldnames-and-values-of-struct-as-namedtuple/8991/2
     df = PT.table
     println(io, "PrepareTable")
-    println(io, "table:   $(nrow(df)) by $(ncol(df)) `$(typeof(df))`")
+    println(io, "table:   $(_brief_info(df))`")
     println(io, "configs: ")
     indent = get(io, :indent, 0)
     for config in PT.configs
         show(IOContext(io, :indent => indent +4), mime, config)
         println(io, "")
     end
-    println(io, "state:   $(PT.state)")
+    println(io, "status: ")
+    # indent = get(io, :indent, 0)
+    println(IOContext(io, :indent => indent +4), "$(PT.status)")
     println(io, "supervised_tables:")
     show(IOContext(io, :indent => indent +4), mime, PT.supervised_tables)
+    println(io, "cache: ")
+    # indent = get(io, :indent, 0)
+    for fnm in fieldnames(Cache)
+        println(IOContext(io, :indent => indent +4), "$(getfield(PT.cache, fnm))")
+    end
 end
 
 function Base.show(io::IO, PTC::PrepareTableConfig)
@@ -115,70 +162,4 @@ function Base.show(io::IO, PTC::PrepareTableConfig)
         # str = str[1:minimum([30, length(str)])]
         println(io, ' '^(get(io, :indent, 0)+4), "$(nm): ", str)
     end
-end
-
-
-function preparetable!(::PrepareTable, PTC::PrepareTableConfig)
-    @error "There is no corresponding method for $(typeof(PTC)) yet. Please create one."
-    # return nothing # do nothing if the corresponding methods not created
-end
-
-"""
-`preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)`
-generates `datetime` column by `PTC.timeargs`, `sort!` by `:datetime`, do `PTC.preprocessing` in `@chain` and check if the table is continuous in time.
-
-!!! note
-    This method will raise essential error, that `PTC::ConfigPreprocess` should be the first `arg` in `args` of `PrepareTable(PT, args...)`.
-    Otherwise, the succeeding processing such as `ConfigAccumulate` or `ConfigSeriesToSupervised` may give incorrect results without error.
-"""
-function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
-    transform!(PT.table, AsTable(PTC.timeargs) => ByRow(args -> DateTime(args...)) => :datetime)
-    sort!(PT.table, :datetime)
-    select!(PT.table, :datetime, PTC.timeargs, PTC.input_features, PTC.target_features)
-    PT.state = Prepare((
-        timeargs        = PTC.timeargs,
-        input_features  = PTC.input_features,
-        target_features = PTC.target_features
-    )) # for later use
-    # PT.table = @chain(PT.table, PTC.preprocessing...) # This will fail
-    PT.table = simplepipeline(PT.table, PTC.preprocessing...)
-    try
-        Δt = PT.table.datetime |> diff |> unique |> only
-    catch
-        @error "The loaded data is not continuous in time."
-    end
-    push!(PT.configs, PTC)
-    return PT
-end
-
-"""
-"""
-function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
-    sfx(i) = "$i$(PTC.unit)"
-    apd = Dict(sfx.(PTC.intervals) .=> PTC.intervals) # create a dictionary
-    for var in PTC.variables.cols
-        addcol_accumulation!(PT.table, [var], apd)
-    end
-    push!(PT.configs, PTC)
-    return PT
-end
-
-
-function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
-    df = PT.table
-    fullX, y0, t0 = series2supervised(
-        df[!, PT.state.args.input_features]  => PTC.shift_x,
-        df[!, PT.state.args.target_features] => PTC.shift_y,
-        df[!, [:datetime]]              => PTC.shift_y)
-
-    # t0v = only(eachcol(t0))
-    # x0v = eachindex(t0v) |> collect
-    # TX = TimeAsX(x0v, t0v; check_approxid = true)
-    PT.supervised_tables = SeriesToSupervised(fullX, y0, t0)
-
-    push!(PT.configs, PTC)
-    PT.state = Train()
-
-    return PT
-    # return fullX, y0, TX
 end
