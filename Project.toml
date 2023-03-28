@@ -26,6 +26,7 @@ CSV = "0.10.9"
 CairoMakie = "0.10.2"
 Chain = "0.5.0"
 DataFrames = "1.5.0"
+FileTrees = "0.3.8"
 Impute = "0.6.10"
 MLJ = "0.19.1"
 MLJDecisionTreeInterface = "0.4.0"
@@ -35,6 +36,7 @@ SWCDatasets = "0.2.5"
 ShiftedArrays = "2.0.0"
 StructArrays = "0.6.14"
 julia = "1.6"
+
 
 [extras]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
