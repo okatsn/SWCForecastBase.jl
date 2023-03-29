@@ -1,7 +1,7 @@
 name = "SWCForecastBase"
 uuid = "f25bfc00-93e4-48b9-89c1-3948a036d4be"
 authors = ["okatsn <okatsn@gmail.com> and contributors"]
-version = "0.4.2"
+version = "0.4.3"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
@@ -32,6 +32,7 @@ MLJ = "0.19.1"
 MLJDecisionTreeInterface = "0.4.0"
 NaNMath = "1.0.2"
 OkTableTools = "0.1.1"
+SWCExampleDatasets = "0.1.0"
 ShiftedArrays = "2.0.0"
 StructArrays = "0.6.14"
 julia = "1.6"
