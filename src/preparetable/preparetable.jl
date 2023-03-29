@@ -33,6 +33,9 @@ function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
 end
 
 """
+`preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)`
+generates derived variables as new columns. See `ConfigAccumulate`.
+
 """
 function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
     sfx(i) = "$i$(PTC.unit)"
@@ -44,7 +47,9 @@ function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
     return PT
 end
 
-
+"""
+`preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)` creates `SeriesToSupervised` as `PT.supervised_tables` for training and testing for supervised models.
+"""
 function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
     df = PT.table
     fullX, y0, t0 = series2supervised(

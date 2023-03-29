@@ -118,7 +118,7 @@ struct ConfigPreprocess <: PrepareTableConfig
 end
 
 """
-`ConfigAccumulate` generate derived variables as the new column, by accumulating the values in each given `intervals`.
+`ConfigAccumulate` generate derived variables as the new columns, by accumulating each variable in `variables` for every interval in each `intervals`.
 
 $PTCdocstring
 
