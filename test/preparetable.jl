@@ -1,9 +1,9 @@
 @testset "preparetable.jl" begin
-    using SWCDatasets
+    using SWCExampleDatasets
     passed = false
 
-    PT =  PrepareTableDefault(SWCDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
-    PTx = PrepareTableDefault(SWCDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
+    PT =  PrepareTableDefault(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
+    PTx = PrepareTableDefault(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
 
     train!(PT; train_before = DateTime(2022, 03, 21))
     test!(PT; test_after = DateTime(2022, 3, 22))
@@ -20,6 +20,6 @@
     @test isequal(DateTime(2099, 1,1), PT.cache.test.args.t[1])
 
 
-    # TODO: it might be more appropriate to have this test in TWAISWCF, since it has SWCDatasets and SWCForecastBase both involved.
+    # TODO: it might be more appropriate to have this test in TWAISWCF, since it has SWCExampleDatasets and SWCForecastBase both involved.
 
 end
