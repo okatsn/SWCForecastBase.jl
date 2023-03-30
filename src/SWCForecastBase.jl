@@ -38,6 +38,7 @@ export fstree, twofstree, manytrees
 using DataFrames
 include("preparetable/briefinfo.jl")
 include("preparetable/preparetable0.jl")
+include("preparetable/requirement.jl")
 include("preparetable/preparetable.jl")
 
 export PrepareTable, PrepareTableDefault, preparetable!, ConfigAccumulate, ConfigPreprocess, ConfigSeriesToSupervised

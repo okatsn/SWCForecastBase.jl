@@ -21,6 +21,7 @@ function train!(PT::PrepareTable;
         max_train_point = 24*120,
         dummykwargs...
     )
+    _check(PT)
     if train_before == :auto
         train_before = now()
     end
@@ -57,6 +58,7 @@ test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
 
 """
 function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480, dummykwargs...)
+    _check(PT)
     if test_after == :auto
        test_after = now()
     end
@@ -68,7 +70,7 @@ function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480, dummy
     Yt = @view PT.supervised_tables.Y[id0:id1,:]
     tt = @view only(eachcol(PT.supervised_tables.T))[id0:id1]
 
-    machs = PT.status.args.machines
+    machs = PT.status.args.machines # load trained machines
 
     Yhat = DataFrame()
     for (mach, (coly, y)) in zip(machs, pairs(eachcol(Yt)))

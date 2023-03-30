@@ -1,5 +1,32 @@
+#  ━━▶ ━━━┓
+# ━┃ ┓ ┗┓⮕
+# ┻ ┳┛┏
+# ⯅⯆⯇⯈▲▼▶◀
+# ┛┻╋┣━━━━━┫
 """
 `TrainTestState` is an abstract type of `Prepare`, `Train`, and `Test`, which indicate the current `status` and be in the latest `cache` of the `PrepareTable`.
+
+# Status in the workflow
+```
+ `PT.status`:
+        `nothing`         `Prepare`d
+ ╠═══════════════════════╬════════════════════╬...
+
+ PT::PrepareTable
+  ┃
+  ┗━━━━ preparetable! ━━━┳━━━━━━▶ preparetable!
+         ▲               ┃        that creates
+         ┗━━━━━━━━━━━━━━━┛    `T.supervised_tables`
+       (preprocessing using                   ┃
+        different configs)                    ┃
+                                              ▼
+                           ┏━━ test! ◀━━ train!
+     (change parameters to ┃          ▲       ┃
+     train or tested again)┗━━━━━━━━━━┻━━━━━━━┛
+
+                         ..═══════════╬═════════..
+                          .`Test`ed and `Train`ed
+```
 
 # Field
 ```

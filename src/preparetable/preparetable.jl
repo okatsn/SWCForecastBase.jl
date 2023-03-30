@@ -1,7 +1,6 @@
-function preparetable!(::PrepareTable, PTC::PrepareTableConfig)
-    @error "There is no corresponding method for $(typeof(PTC)) yet. Please create one."
-    # return nothing # do nothing if the corresponding methods not created
-end
+# function preparetable!(::PrepareTable, PTC::PrepareTableConfig)
+# # Fallback
+# end
 
 """
 `preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)`
@@ -12,6 +11,8 @@ generates `datetime` column by `PTC.timeargs`, `sort!` by `:datetime`, do `PTC.p
     Otherwise, the succeeding processing such as `ConfigAccumulate` or `ConfigSeriesToSupervised` may give incorrect results without error.
 """
 function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
+    _check(PT, PTC)
+
     transform!(PT.table, AsTable(PTC.timeargs) => ByRow(args -> DateTime(args...)) => :datetime)
     sort!(PT.table, :datetime)
     select!(PT.table, :datetime, PTC.timeargs, PTC.input_features, PTC.target_features)
@@ -38,6 +39,8 @@ generates derived variables as new columns. See `ConfigAccumulate`.
 
 """
 function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
+    _check(PT, PTC)
+
     sfx(i) = "$i$(PTC.unit)"
     apd = Dict(sfx.(PTC.intervals) .=> PTC.intervals) # create a dictionary
     for var in PTC.variables.cols
@@ -51,6 +54,8 @@ end
 `preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)` creates `SeriesToSupervised` as `PT.supervised_tables` for training and testing for supervised models.
 """
 function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
+    _check(PT, PTC)
+
     df = PT.table
     fullX, y0, t0 = series2supervised(
         df[!, PT.status.args.input_features]  => PTC.shift_x,
