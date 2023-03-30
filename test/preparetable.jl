@@ -1,3 +1,32 @@
+@testset "PrepreTable workflow" begin
+    using SWCExampleDatasets
+    using DataFrames
+    using SWCForecastBase: IncorrectOrder, _check, take_hour_last, precipmax!
+
+    PT =  PrepareTable(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
+
+    @test_throws IncorrectOrder preparetable!(PT, ConfigAccumulate())
+    @test_throws IncorrectOrder preparetable!(PT, ConfigSeriesToSupervised())
+    @test_throws IncorrectOrder train!(PT)
+    @test_throws IncorrectOrder test!(PT)
+
+    preparetable!(PT, ConfigPreprocess(
+        preprocessing   = [
+                            take_hour_last,
+                            disallowmissing!,
+                            precipmax!], )
+    )
+
+    preparetable!(PT, ConfigAccumulate(; variables = Cols(:precipitation_max)))
+
+    @test_throws IncorrectOrder train!(PT; train_before = DateTime(2022, 03, 21))
+    @test_throws IncorrectOrder test!(PT; test_after = DateTime(2022, 3, 22))
+
+    preparetable!(PT, ConfigSeriesToSupervised())
+    @test isnothing(_check(PT))
+end
+
+
 @testset "preparetable.jl" begin
     using SWCExampleDatasets
     passed = false
