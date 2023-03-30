@@ -1,6 +1,6 @@
 function preparetable!(::PrepareTable, PTC::PrepareTableConfig)
-    @error "There is no corresponding method for $(typeof(PTC)) yet. Please create one."
-    # return nothing # do nothing if the corresponding methods not created
+    _check(PT, PTC)
+    preparetable!(PT, PTC)
 end
 
 """
