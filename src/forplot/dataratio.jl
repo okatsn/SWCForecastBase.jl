@@ -125,7 +125,7 @@ This is intended to extend Makie `convert_arguments` methods for `DataRatio`, bu
 # Example
 ```julia
 using Dates, SWCExampleDatasets, CairoMakie
-ari0 = SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820")
+ari0 = SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820_example")
 DR = DataRatio(ari0, Month(1), SWCForecastBase.islnan)
 DR |> convert_arguments |> x -> heatmap(x...)
 ```

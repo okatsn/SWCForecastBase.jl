@@ -3,7 +3,7 @@
     using DataFrames
     using SWCForecastBase: IncorrectOrder, _check, take_hour_last, precipmax!
 
-    PT =  PrepareTable(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
+    PT =  PrepareTable(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820_example"))
 
     @test_throws IncorrectOrder preparetable!(PT, ConfigAccumulate())
     @test_throws IncorrectOrder preparetable!(PT, ConfigSeriesToSupervised())
@@ -31,8 +31,8 @@ end
     using SWCExampleDatasets
     passed = false
 
-    PT =  PrepareTableDefault(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
-    PTx = PrepareTableDefault(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820"))
+    PT =  PrepareTableDefault(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820_example"))
+    PTx = PrepareTableDefault(SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820_example"))
 
     train!(PT; train_before = DateTime(2022, 03, 21))
     test!(PT; test_after = DateTime(2022, 3, 22))

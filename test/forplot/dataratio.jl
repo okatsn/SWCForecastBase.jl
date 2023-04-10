@@ -1,6 +1,6 @@
 @testset "dataratio.jl" begin
     using SWCExampleDatasets, Dates
-    ari0 = SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820")
+    ari0 = SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820_example")
 
     df0 = deepcopy(ari0)
     transform_datetime!(df0, :datetime)
@@ -38,7 +38,7 @@ end
 
 @testset "convert_arguments(DR::DataRatio)" begin
     using Dates, SWCExampleDatasets, CairoMakie
-    ari0 = SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820")
+    ari0 = SWCExampleDatasets.dataset("NCUWiseLab", "ARI_G2F820_example")
     DR = DataRatio(ari0, Month(1), SWCForecastBase.islnan)
     DR |> convert_arguments |> x -> heatmap(x...)
     @test true
