@@ -155,9 +155,10 @@ end
 """
 # Example
 ```julia
+using CairoMakie, SWCForecastBase
 f = Figure(; resolution=(800,600))
 ax = Axis(f[1,1])
-hmap = SWCForecastBase.heatmap!(ax, DR::DataRatio; colormap = "diverging_rainbow_bgymr_45_85_c67_n256")
+hmap = heatmap!(ax, DR::DataRatio; colormap = "diverging_rainbow_bgymr_45_85_c67_n256")
 Colorbar(f[1, 2], hmap, label = "missing data rate")
 ```
 
