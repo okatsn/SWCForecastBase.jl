@@ -7,28 +7,31 @@ Training with `PrepareTable`.
 train!(PT::PrepareTable;
         train_before = :auto,
         model = manytrees(),
-        max_train_point = 24*120
+        numpoints_train = 24*120
     )
 ```
 
 - `train_before`: The `DateTime` or `Date` before which the data is used for training; if `:auto`, `train_before = now()`.
 - `model`: The model; it can be any `MLJ` model.
-- `max_train_point`: from `train_before` how many data points (number of rows) to be included for model training.
+- `numpoints_train`: from `train_before` how many data points (number of rows) to be included for model training.
 """
 function train!(PT::PrepareTable;
         train_before = :auto,
         model = manytrees(),
-        max_train_point = 24*120,
+        numpoints_train = 24*120,
         dummykwargs...
     )
+    # CHECKPOINT: SlidingTrainTestWindow04200910
+    # - [ ] train!(PT, SlidingTrainTestWindow(); ...)
+    # - [ ] test!(PT, SlidingTrainTestWindow(); ...)
+    # - [ ] traintest!(PT, SlidingTrainTestWindow(); ...)
+
     _check(PT)
     if train_before == :auto
         train_before = now()
     end
 
-    _, id1s = sortbydist(PT.supervised_tables.T, Cols(r"\Adatetime"), [train_before]) # you can only have exactly one column started with "datetime"
-    id1 = first(id1s)
-    id0 = maximum([1, id1 - max_train_point])
+    (id0, id1) = _train_id0id1(PT, train_before, numpoints_train)
 
     X = @view PT.supervised_tables.X[id0:id1, :]
     Y = @view PT.supervised_tables.Y[id0:id1, :]
@@ -38,6 +41,23 @@ function train!(PT::PrepareTable;
     PT.status = Train((machines = machs, X = X, Y = Y, t = t))
     PT.cache.train = PT.status
     return PT
+end
+
+function _train_id0id1(PT, train_before, numpoints_train)
+    _, id1s = sortbydist(PT.supervised_tables.T, Cols(r"\Adatetime"), [train_before]) # you can only have exactly one column started with "datetime"
+    id1 = first(id1s)
+    id0 = maximum([1, id1 - numpoints_train])
+    return (id0, id1)
+end
+# CHECKPOINT: SlidingTrainTestWindow04200910: make _train_id0id1 and _test_id0id1 compatible with SlidingTrainTestWindow
+# - ?Replace numpoints_train, numpoints_test by window_train, window_test
+# - ?New method _train_id0id1(PT, STTW),
+# - ?New method _test_id0id1(PT, STTW),
+function _test_id0id1(PT, test_after, numpoints_test)
+    _, id0s = sortbydist(PT.supervised_tables.T, Cols(r"\Adatetime"), [test_after])
+    id0 = first(id0s)
+    id1 = minimum([id0+numpoints_test, nrow(PT.supervised_tables.T)])
+    return (id0, id1)
 end
 
 # TODO: future work: the learning network of 0.19.1:
@@ -50,21 +70,20 @@ end
 # Example
 
 ```julia
-test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480)
+test!(PT::PrepareTable; test_after = :auto, numpoints_test = 480)
 ```
 
 - `test_after`: the `DateTime` or `Date` after which model prediction (model testing stage) starts. If `:auto`, `test_after = now()`.
-- `test_numpoints`: the number of data points in the "future" to be tested.
+- `numpoints_test`: the number of data points in the "future" to be tested.
 
 """
-function test!(PT::PrepareTable; test_after = :auto, test_numpoints = 480, dummykwargs...)
+function test!(PT::PrepareTable; test_after = :auto, numpoints_test = 480, dummykwargs...)
     _check(PT)
     if test_after == :auto
        test_after = now()
     end
-    _, id0s = sortbydist(PT.supervised_tables.T, Cols(r"\Adatetime"), [test_after])
-    id0 = first(id0s)
-    id1 = minimum([id0+test_numpoints, nrow(PT.supervised_tables.T)])
+
+    id0, id1 = _test_id0id1(PT, test_after, numpoints_test)
 
     Xt = @view PT.supervised_tables.X[id0:id1,:]
     Yt = @view PT.supervised_tables.Y[id0:id1,:]
