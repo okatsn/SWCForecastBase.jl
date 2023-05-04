@@ -190,14 +190,24 @@ cache::Cache
 
 
 # Example
+
 ```julia
     PrepareTable(df::DataFrame, ConfigPreprocess(), ConfigAccumulate(), ConfigSeriesToSupervised())
 ```
 
-or simply
+is equivalently
 
 ```julia
     DefaultPrepareTable(df)
+```
+
+# Another example
+```julia
+PrepareTable(df,
+    ConfigPreprocess(;target_features=Cols(r"soil_water_content_10cm")),
+    ConfigAccumulate(),
+    ConfigSeriesToSupervised(; shift_x=[0, -2])
+)
 ```
 
 See also `DefaultPrepareTable`.
