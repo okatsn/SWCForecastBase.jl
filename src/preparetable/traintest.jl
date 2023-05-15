@@ -5,9 +5,9 @@ Training with `PrepareTable`.
 
 ```julia
 train!(PT::PrepareTable;
-        train_before = :auto,
-        model = manytrees(),
-        numpoints_train = 24*120
+        train_before = :auto, # default
+        model = manytrees(),    # default
+        numpoints_train = 24*120 # default
     )
 ```
 
@@ -70,7 +70,8 @@ end
 # Example
 
 ```julia
-test!(PT::PrepareTable; test_after = :auto, numpoints_test = 480)
+test!(PT::PrepareTable; test_after = :auto,  # default
+    numpoints_test = 480)   # default
 ```
 
 - `test_after`: the `DateTime` or `Date` after which model prediction (model testing stage) starts. If `:auto`, `test_after = now()`.
