@@ -14,7 +14,11 @@ function imputemean!(df)
     # disallowmissing!(df) # sadly, disallowmissing! does not support subdataframe (e.g., df1 = @view df1[:, Not(:datetime)]; disallowmissing!(df1))
 end
 
+"""
+Similar to `imputemean!(df)`, `imputeinterp!(df)` interpolate literal `nan` values using linear interpolation, and extrapolate using Next Observation Carried Backward (NOCB) and Last Observation Carried Forward (LOCF).
 
+See also `imputemean!`.
+"""
 function imputeinterp!(df)
     _replacenanbymissing!(df)
     _dealwithallmissingby!(df, 999)
