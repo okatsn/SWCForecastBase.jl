@@ -17,17 +17,18 @@ function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
     sort!(PT.table, :datetime)
     select!(PT.table, :datetime, PTC.timeargs, PTC.input_features, PTC.target_features)
     PT.status = Prepare((
-        timeargs        = PTC.timeargs,
-        input_features  = PTC.input_features,
-        target_features = PTC.target_features
+        timeargs=PTC.timeargs,
+        input_features=PTC.input_features,
+        target_features=PTC.target_features
     )) # for later use
     PT.cache.prepare = PT.status
     # PT.table = @chain(PT.table, PTC.preprocessing...) # This will fail
     PT.table = simplepipeline(PT.table, PTC.preprocessing...)
     try
         Δt = PT.table.datetime |> diff |> unique |> only
-    catch
+    catch e
         @error "The loaded data is not continuous in time."
+        throw(e)
     end
     push!(PT.configs, PTC)
     return PT
@@ -58,9 +59,9 @@ function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
 
     df = PT.table
     fullX, y0, t0 = series2supervised(
-        df[!, PT.status.args.input_features]  => PTC.shift_x,
+        df[!, PT.status.args.input_features] => PTC.shift_x,
         df[!, PT.status.args.target_features] => PTC.shift_y,
-        df[!, [:datetime]]              => PTC.shift_y)
+        df[!, [:datetime]] => PTC.shift_y)
 
     # t0v = only(eachcol(t0))
     # x0v = eachindex(t0v) |> collect
