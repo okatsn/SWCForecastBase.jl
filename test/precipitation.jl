@@ -13,7 +13,7 @@ end
     df = DataFrame(
         "hello" => hello,
     )
-    @test_throws NotSufficientRows SWCForecastBase.addcol_accumulation!(df, ["hello"], Dict("csum23" => 23))
+    @test_throws SWCForecastBase.NotSufficientRows SWCForecastBase.addcol_accumulation!(df, ["hello"], Dict("csum23" => 23))
 
     SWCForecastBase.addcol_accumulation!(df, ["hello"], Dict("csum5" => 5))
     chello = map(sum, [hello[(i-5+1):i] for i = 5:22])
