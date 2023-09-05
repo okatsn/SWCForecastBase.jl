@@ -1,9 +1,9 @@
 function combinegroup_allcols(df, gpby, withwhat)
-    @chain df begin
+    df = @chain df begin
         groupby(gpby)
-        combine(All() .=> withwhat; renamecols = false)
+        combine(All() .=> withwhat; renamecols=false)
     end
-    return df # TODO: test me
+    return df
 end
 
 
