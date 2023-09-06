@@ -38,3 +38,7 @@ Workflow overview:
 - `PrepareTable`
 - `traintest!`
 - `save`
+
+## v0.4.10
+- Better `show` for `SeriesToSupervised`
+- Fix `take_last_hour`
