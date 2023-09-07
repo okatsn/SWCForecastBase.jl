@@ -56,9 +56,9 @@ Prepare() = Prepare(NamedTuple())
 
 function Base.show(io::IO, tts::TrainTestState)
     indent = get(io, :indent, 0)
-    println(io,' '^(indent+4), "$(typeof(tts)):")
+    println(io, ' '^(indent + 4), "$(typeof(tts)):")
     for (k, v) in pairs(tts.args)
-        println(io,' '^(indent+8), "$k: $(_brief_info(v))")
+        println(io, ' '^(indent + 8), "$k: $(_brief_info(v))")
     end
 end
 
@@ -102,9 +102,9 @@ struct ConfigSeriesToSupervised <: PrepareTableConfig
     shift_x::Vector{<:Int}
     shift_y::Vector{<:Int}
     function ConfigSeriesToSupervised(;
-        shift_x         = [0, -6, -12, -24, -36, -48, -60, -72],
-        shift_y         = [1],
-        )
+        shift_x=[0, -6, -12, -24, -36, -48, -60, -72],
+        shift_y=[1]
+    )
         new(shift_x, shift_y)
     end
 end
@@ -130,11 +130,11 @@ struct ConfigPreprocess <: PrepareTableConfig
     target_features::Cols
     preprocessing
     function ConfigPreprocess(;
-        timeargs            = Cols(:year, :month, :day, :hour), # sort, group by, and combine according to the last
-        input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"windspeed", r"precipitation"),
-        target_features = Cols(r"soil_water_content"),
-        preprocessing   = [take_hour_last, removeunreasonables!, imputeinterp!, disallowmissing!, precipmax!],
-        )
+        timeargs=Cols(:year, :month, :day, :hour), # sort, group by, and combine according to the last
+        input_features=Cols(r"air_temp", r"humidity", r"pressure", r"windspeed", r"precipitation"),
+        target_features=Cols(r"soil_water_content"),
+        preprocessing=[take_hour_last, removeunreasonables!, imputeinterp!, disallowmissing!, precipmax!]
+    )
         new(
             timeargs,
             input_features,
@@ -162,16 +162,10 @@ ConfigAccumulate(; variables = Cols(:precipitation_max),
 - `unit`: unit of intervals as appended string of the new column, e.g., day.
 
 """
-struct ConfigAccumulate <: PrepareTableConfig
-    variables::Cols
-    intervals::Vector{<:Int}
-    unit # unit of intervals as appended string of the new column, e.g., day.
-    function ConfigAccumulate(; variables = Cols(:precipitation_max),
-                                intervals = [1, 12, 24, 48, 36],
-                                unit = ""
-        )
-        new(variables, intervals, unit)
-    end
+@kwdef struct ConfigAccumulate <: PrepareTableConfig
+    variables::Cols = Cols(:precipitation_max)
+    intervals::Vector{<:Int} = [1, 12, 24, 48, 36]
+    unit = "" # unit of intervals as appended string of the new column, e.g., day.
 end
 
 
@@ -215,8 +209,8 @@ See also `DefaultPrepareTable`.
 mutable struct PrepareTable
     table::DataFrame
     configs::Vector{<:PrepareTableConfig}
-    status::Union{TrainTestState, Nothing}
-    supervised_tables::Union{SeriesToSupervised, Nothing}
+    status::Union{TrainTestState,Nothing}
+    supervised_tables::Union{SeriesToSupervised,Nothing}
     cache::Cache
     function PrepareTable(table)
         new(table, PrepareTableConfig[], nothing, nothing,
@@ -266,19 +260,19 @@ function Base.show(io::IO, mime::MIME"text/plain", PT::PrepareTable)
     println(io, "configs: ")
     indent = get(io, :indent, 0)
     for config in PT.configs
-        show(IOContext(io, :indent => indent +4), mime, config)
+        show(IOContext(io, :indent => indent + 4), mime, config)
         println(io, "")
     end
     println(io, "status: ")
     # indent = get(io, :indent, 0)
-    println(IOContext(io, :indent => indent +4), "$(PT.status)")
+    println(IOContext(io, :indent => indent + 4), "$(PT.status)")
     println(io, "supervised_tables:")
-    show(IOContext(io, :indent => indent +4), mime, PT.supervised_tables)
+    show(IOContext(io, :indent => indent + 4), mime, PT.supervised_tables)
     println(io, "")
     println(io, "cache: ")
     # indent = get(io, :indent, 0)
     for fnm in fieldnames(Cache)
-        println(IOContext(io, :indent => indent +4), "$(getfield(PT.cache, fnm))")
+        println(IOContext(io, :indent => indent + 4), "$(getfield(PT.cache, fnm))")
     end
 end
 
@@ -288,6 +282,6 @@ function Base.show(io::IO, PTC::PrepareTableConfig)
     for nm in fnames
         str = string(getfield(PTC, nm))
         # str = str[1:minimum([30, length(str)])]
-        println(io, ' '^(get(io, :indent, 0)+4), "$(nm): ", str)
+        println(io, ' '^(get(io, :indent, 0) + 4), "$(nm): ", str)
     end
 end

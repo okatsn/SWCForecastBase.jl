@@ -16,6 +16,9 @@ export simplepipeline
 using Chain
 include("combinegroup.jl")
 export combinegroup_allcols
+include("dataframeutilities/take_hour_last.jl")
+export take_hour_last
+
 
 using NaNMath
 include("precipitation.jl")

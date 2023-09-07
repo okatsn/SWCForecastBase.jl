@@ -9,7 +9,9 @@ function movingaverage(v::Vector{<:AbstractFloat}, n::Int)
     return out
 end
 
-
+struct NotSufficientRows <: Exception
+    var::String
+end
 
 """
 Add columns that are derived by accumulating corresponding variables using `movingaverage`.
@@ -33,14 +35,22 @@ addcol_accumulation!(df, all_precipstr, apd)
 See also: `movingaverage`.
 """
 function addcol_accumulation!(df, all_precipstr, apd)
+    maxaccu = maximum(values(apd))
+    nrowdf = nrow(df)
+    if nrowdf < maxaccu
+        maxetry = filter(p -> p.second == maxaccu, apd)
+        (dkey, dval) = [(k => v) for (k, v) in maxetry] |> only
+        throw(NotSufficientRows("The number of rows of the input DataFrame is $(nrowdf), is insufficient to calculate accumulation of $dkey which requires at least $dval of rows."))
+    end # Error will also occur in the later `deleteat!` if reached.
+
     if !isempty(apd)
         for pstr in all_precipstr
             for (k, v) in apd
-                DataFrames.transform!(df, pstr => (x -> movingaverage(x, v).*v) => Symbol("$(pstr)_$k"))
+                DataFrames.transform!(df, pstr => (x -> movingaverage(x, v) .* v) => Symbol("$(pstr)_$k"))
             end
         end
 
-        deleteat!(df, 1:(maximum(values(apd))-1))
+        deleteat!(df, 1:(maxaccu-1))
     else
         @warn "apd is empty."
     end
@@ -56,17 +66,17 @@ function cccount(ts)
     # It is OK to execute this piece of code directly in REPL, but an error will occurred if `include`d.
     # In julia to prevent "spooky action at a distance", `noraincounts` will always redefined as new local if the piece of code execute by `include`.
     # see https://docs.julialang.org/en/v1/manual/variables-and-scoping/#On-Soft-Scope
-        nts = deepcopy(ts)
-        noraincounts = 0
-        for (i, ti) in enumerate(ts)
-            if isapprox(ti, 0.0)
-                noraincounts += 1
-            else
-                noraincounts = 0
-            end
-            nts[i] = noraincounts
+    nts = deepcopy(ts)
+    noraincounts = 0
+    for (i, ti) in enumerate(ts)
+        if isapprox(ti, 0.0)
+            noraincounts += 1
+        else
+            noraincounts = 0
         end
-        return nts
+        nts[i] = noraincounts
+    end
+    return nts
 end
 
 
