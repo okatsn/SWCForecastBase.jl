@@ -1,7 +1,7 @@
 name = "SWCForecastBase"
 uuid = "f25bfc00-93e4-48b9-89c1-3948a036d4be"
 authors = ["okatsn <okatsn@gmail.com> and contributors"]
-version = "0.4.10"
+version = "0.4.11"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"

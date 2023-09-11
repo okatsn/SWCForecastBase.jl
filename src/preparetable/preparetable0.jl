@@ -145,7 +145,7 @@ struct ConfigPreprocess <: PrepareTableConfig
 end
 
 """
-`ConfigAccumulate` generate derived variables as the new columns, by accumulating each variable in `variables` for every interval in each `intervals`.
+`ConfigAccumulate` is the configuration for generating derived variables as the new columns, by accumulating each variable in `variables` for every interval in each `intervals`.
 
 $PTCdocstring
 
@@ -161,12 +161,62 @@ ConfigAccumulate(; variables = Cols(:precipitation_max),
 - `intervals`: the window length for accumulating an variable.
 - `unit`: unit of intervals as appended string of the new column, e.g., day.
 
+`unit` can be an arbitrary function, for example:
+```@docs
+unithour
+```
+
+
+See `accu_unit_suffix_function` and `addcol_accumulation!`.
 """
 @kwdef struct ConfigAccumulate <: PrepareTableConfig
     variables::Cols = Cols(:precipitation_max)
     intervals::Vector{<:Int} = [1, 12, 24, 48, 36]
     unit = "" # unit of intervals as appended string of the new column, e.g., day.
 end
+
+"""
+`unithour(x)` is an exemplary suffix formatter.
+
+```jldoctest
+SWCForecastBase.unithour(5)
+
+# output
+
+"5hr"
+```
+
+```jldoctest
+SWCForecastBase.unithour(24)
+
+# output
+
+"1d"
+```
+
+```jldoctest
+SWCForecastBase.unithour(36)
+
+# output
+
+"1d12hr"
+```
+
+
+"""
+function unithour(x)
+    nday = div(x, 24)
+    nhrs = rem(x, 24)
+    dstr = hrstr = ""
+    if nday > 0
+        dstr = "$(nday)d"
+    end
+    if nhrs > 0
+        hrstr = "$(nhrs)hr"
+    end
+    return dstr * hrstr
+end
+
 
 
 """

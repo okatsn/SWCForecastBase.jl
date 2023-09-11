@@ -42,7 +42,7 @@ generates derived variables as new columns. See `ConfigAccumulate`.
 function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
     _check(PT, PTC)
 
-    sfx(i) = "$i$(PTC.unit)"
+    sfx = accu_unit_suffix_function(PTC.unit)
     apd = Dict(sfx.(PTC.intervals) .=> PTC.intervals) # create a dictionary
     for var in PTC.variables.cols
         addcol_accumulation!(PT.table, [var], apd)
@@ -50,6 +50,28 @@ function preparetable!(PT::PrepareTable, PTC::ConfigAccumulate)
     push!(PT.configs, PTC)
     return PT
 end
+
+"""
+`accu_unit_suffix_function` returns a suffix function `sfx(i)` for generates the keys for `apd = Dict(sfx.(PTC.intervals) .=> PTC.intervals)` that is going to be fed into `addcol_accumulation!`, where `PTC::ConfigAccumulate`.
+
+`accu_unit_suffix_function(PTCunit::AbstractString)` returns `i -> "\$i\$(PTCunit)"`.
+
+This returned function is essential for generate readable tags appended as the new column names when using `PrepareTable`, `PrepareTableDefault`, or `preparetable!` with the configuration `ConfigAccumulate`.
+"""
+function accu_unit_suffix_function(PTCunit::AbstractString)
+    return i -> "$i$(PTCunit)"
+end
+
+"""
+
+If input is a function, it simply returns its argument:
+`accu_unit_suffix_function(PTCunit::Function) = PTCunit`.
+
+This is for the case for customized suffix-generating function.
+
+See also `ConfigAccumulate`.
+"""
+accu_unit_suffix_function(PTCunit::Function) = PTCunit
 
 """
 `preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)` creates `SeriesToSupervised` as `PT.supervised_tables` for training and testing for supervised models.
