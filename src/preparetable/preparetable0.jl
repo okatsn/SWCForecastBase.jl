@@ -118,7 +118,7 @@ $PTCdocstring
 ```julia
 ConfigPreprocess(;
         timeargs = Cols(:year, :month, :day, :hour),
-        input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"windspeed", r"precipitation"),
+        input_features  = Cols(r"air_temp", r"humidity", r"pressure", r"wind_speed", r"precipitation"),
         target_features = Cols(r"soil_water_content"),
         preprocessing   = [take_hour_last, removeunreasonables!, imputeinterp!, disallowmissing!, precipmax!],
         )
@@ -131,7 +131,7 @@ struct ConfigPreprocess <: PrepareTableConfig
     preprocessing
     function ConfigPreprocess(;
         timeargs=Cols(:year, :month, :day, :hour), # sort, group by, and combine according to the last
-        input_features=Cols(r"air_temp", r"humidity", r"pressure", r"windspeed", r"precipitation"),
+        input_features=Cols(r"air_temp", r"humidity", r"pressure", r"wind_speed", r"precipitation"),
         target_features=Cols(r"soil_water_content"),
         preprocessing=[take_hour_last, removeunreasonables!, imputeinterp!, disallowmissing!, precipmax!]
     )

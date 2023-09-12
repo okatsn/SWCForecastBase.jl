@@ -33,7 +33,7 @@ end
 
 
 function _replacenanbymissing!(df)
-    select!(df, AsTable(:) => ByRow(nt -> map(x -> (islnan(x) ? missing : x), nt)) => AsTable ) # Also see SWCForecastBase.islnan
+    select!(df, AsTable(:) => ByRow(nt -> map(x -> (islnan(x) ? missing : x), nt)) => AsTable) # Also see SWCForecastBase.islnan
     # Substitute NaN by missing:
     # - `df_all = ifelse.(ismissing.(df_all) .| isnan.(df_all), missing, df_all)`
     # - the first `ismissing` since `isnan(missing)` returns `missing`
@@ -55,8 +55,8 @@ isoutofrange(value, l0, l1) = isnnm(value) ? false : (value < l0 || value > l1)
 
 function outer2missing!(df_all, colnames, limits)
     l0, l1 = limits
-    df = df_all[!,colnames]
-    df_all[!,colnames] = ifelse.(isoutofrange.(df, l0, l1), missing, df)
+    df = df_all[!, colnames]
+    df_all[!, colnames] = ifelse.(isoutofrange.(df, l0, l1), missing, df)
     df_all
 end
 
@@ -86,5 +86,13 @@ function removeunreasonables!(df_all)
 
     colnames = names(df_all, r"humidity")
     limits = (0, 100)
+    outer2missing!(df_all, colnames, limits)
+
+    colnames = names(df_all, r"wind_speed")
+    limits = (0, Inf)
+    outer2missing!(df_all, colnames, limits)
+
+    colnames = names(df_all, r"pressure")
+    limits = (0, Inf)
     outer2missing!(df_all, colnames, limits)
 end

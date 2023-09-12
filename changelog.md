@@ -45,3 +45,6 @@ Workflow overview:
 
 ## v0.4.12
 - Fix `precipmax!` and add some tests for it.
+
+## v0.4.13
+- Remove unreasonable `wind_speed` and `pressure`; Fix typo.
