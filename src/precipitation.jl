@@ -82,7 +82,10 @@ end
 
 """
 `precipmax!(df::DataFrame)` creates `precipitation_max` by maximize `Cols(r"\\Aprecipitation")` `ByRow`.
+Noted that the original "precipitation*" columns were dropped; only `:precipitation_max` kept.
 """
 function precipmax!(df::DataFrame)
-    transform!(df, AsTable(Cols(r"\Aprecipitation")) => ByRow(maximum) => :precipitation_max)
+    target = Cols(r"\Aprecipitation")
+    transform!(df, AsTable(target) => ByRow(maximum) => :precipitation_max)
+    select!(df, Not(target), :precipitation_max; renamecols=false)
 end

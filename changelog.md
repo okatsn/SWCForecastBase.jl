@@ -42,3 +42,6 @@ Workflow overview:
 ## v0.4.10
 - Better `show` for `SeriesToSupervised`
 - Fix `take_last_hour`
+
+## v0.4.12
+- Fix `precipmax!` and add some tests for it.
