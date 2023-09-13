@@ -48,3 +48,6 @@ Workflow overview:
 
 ## v0.4.13
 - Remove unreasonable `wind_speed` and `pressure`; Fix typo.
+
+## v0.4.14
+- Add `shift_t` in `ConfigSeriesToSupervised`
