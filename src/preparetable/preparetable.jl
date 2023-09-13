@@ -7,8 +7,8 @@
 generates `datetime` column by `PTC.timeargs`, `sort!` by `:datetime`, do `PTC.preprocessing` in `@chain` and check if the table is continuous in time.
 
 !!! note
-    This method will raise essential error, that `PTC::ConfigPreprocess` should be the first `arg` in `args` of `PrepareTable(PT, args...)`.
-    Otherwise, the succeeding processing such as `ConfigAccumulate` or `ConfigSeriesToSupervised` may give incorrect results without error.
+    This method will raise essential error, unless that `PTC::ConfigPreprocess` is the first `arg` in `args` of `PrepareTable(PT, args...)` as it should be.
+    This is intended since `ConfigAccumulate` or `ConfigSeriesToSupervised` is designed to work on a well preprocessed data, and it may give incorrect results without error (e.g., time tag mismatch) if `preparetable!` with `ConfigPreprocess` is not conducted before.
 """
 function preparetable!(PT::PrepareTable, PTC::ConfigPreprocess)
     _check(PT, PTC)

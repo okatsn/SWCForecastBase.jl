@@ -110,6 +110,8 @@ struct ConfigSeriesToSupervised <: PrepareTableConfig
 end
 
 """
+`ConfigPreprocess` is the configuration for a table of time series input/target features.
+
 `ConfigPreprocess` controls the primary feature selection and how the data being preprocessed before training.
 
 $PTCdocstring
@@ -123,6 +125,9 @@ ConfigPreprocess(;
         preprocessing   = [take_hour_last, removeunreasonables!, imputeinterp!, disallowmissing!, precipmax!],
         )
 ```
+
+`PrepareTable` with `ConfigPreprocess` creates a new column `:datetime` according to `timeargs`. See `preparetable!`.
+
 """
 struct ConfigPreprocess <: PrepareTableConfig
     timeargs::Cols
