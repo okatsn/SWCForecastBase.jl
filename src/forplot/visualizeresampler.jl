@@ -46,6 +46,10 @@ function Makie.plot!(
     bar_froms = Observable(Float32[])
     bar_tos = Observable(Float32[])
     colors = Observable(Bool[])
+    # CHECKPOINT:
+    # - remove/revise `colors`
+    # - `bar_tos` and `bar_froms` both should have a left and right version.
+    # - in fact, I already have a similar recipe `TwoHStackedBoxes` in OkMakieToolkits. This branch should be aborted.
 
     # this helper function will update our observables
     # whenever `times` or `stockvalues` change
