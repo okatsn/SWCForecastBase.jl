@@ -64,4 +64,7 @@ using Dates, Statistics, DataFrames, ShiftedArrays, StructArrays
 using CairoMakie
 include("forplot/dataratio.jl")
 export dataratio, DataRatio, transform_datetime!
+
+
+include("forplot/visualizeresampler.jl")
 end
