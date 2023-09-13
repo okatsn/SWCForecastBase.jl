@@ -16,7 +16,7 @@ function ordinalsuffix(y)
     return sfx
 end
 
-struct ResamplerSpan{T<:Real}
+struct TwoBar{T<:Real}
     left0::T
     left1::T
     right0::T
@@ -32,11 +32,11 @@ end
 end
 
 function Makie.plot!(
-    sc::StockChart{<:Tuple{AbstractVector{<:Real},AbstractVector{<:StockValue}}})
+    sc::ResamplerSpan{<:Tuple{AbstractVector{<:Real},AbstractVector{<:TwoBar}}})
 
     # our first argument is an observable of parametric type AbstractVector{<:Real}
     times = sc[1]
-    # our second argument is an observable of parametric type AbstractVector{<:StockValue}}
+    # our second argument is an observable of parametric type AbstractVector{<:TwoBar}}
     stockvalues = sc[2]
 
     # we predefine a couple of observables for the linesegments
@@ -88,12 +88,12 @@ function Makie.plot!(
         [dc, uc]
     end
 
-    # in the last step we plot into our `sc` StockChart object, which means
+    # in the last step we plot into our `sc` ResamplerSpan object, which means
     # that our new plot is just made out of two simpler recipes layered on
     # top of each other
     linesegments!(sc, linesegs, color=colors, colormap=colormap)
     barplot!(sc, times, bar_froms, fillto=bar_tos, color=colors, strokewidth=0, colormap=colormap)
 
-    # lastly we return the new StockChart
+    # lastly we return the new ResamplerSpan
     sc
 end
