@@ -1,12 +1,30 @@
-abstract type Comparable end
-# This abstract type is required for not breaking things when defining your custom `==`.
-# See https://stackoverflow.com/questions/62336686/struct-equality-with-arrays
+abstract type MyComparableness end
+
+struct MyComparable end
+struct NotMyComparable end
+
+is_comparable(::Type{<:PrepareTableConfig}) = MyComparable()
+is_comparable(::Type{<:Cols}) = MyComparable()
+# ... keep adding whatever you like with the following my comparable == function
+is_comparable(tp) = NotMyComparable()
+
+# See also:
+# https://stackoverflow.com/questions/62336686/struct-equality-with-arrays
 # and https://stackoverflow.com/questions/66801702/deriving-equality-for-julia-structs-with-mutable-members
 
-function Base.:(==)(a::T, b::T) where {T<:Union{Comparable,Cols}} # because Cols is not comparable.
+function mycompare(a::T, b::T, ::MyComparable) where {T}
     fields = fieldnames(T)
     getfield.(Ref(a), fields) == getfield.(Ref(b), fields)
 end
+
+function mycompare(a::T, b::T, ::NotMyComparable) where {T}
+    a == b
+end
+
+
+function Base.:(==)(a::T, b::T) where {T<:MyComparableness} # because Cols is not comparable.
+    mycompare(a, b, is_comparable(typeof(a)))
+end # trying Holy trait for this task failed here. The `is_comparable` helps the dispatches of `mycompare`, and our goal is to make `==` simultaneouly works with `PrepareTableConfig` and some other structs like `Cols`. In this function, `T<:MyComparableness` is a must to extend `Base.==` without breaking anything; however, this also prohibits `Cols` from dispatched to this `==` method.
 
 #  ━━▶ ━━━┓
 # ━┃ ┓ ┗┓⮕
@@ -89,7 +107,7 @@ mutable struct Cache
 end
 
 
-abstract type PrepareTableConfig <: Comparable end
+abstract type PrepareTableConfig <: MyComparableness end
 PTCdocstring = "Use keyword arguments to construct the object."
 
 """
