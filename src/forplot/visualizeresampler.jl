@@ -32,7 +32,7 @@ end
 end
 
 function Makie.plot!(
-    sc::ResamplerSpan{<:Tuple{AbstractVector{<:Real},AbstractVector{<:TwoBar}}})
+    sc::ResamplerSpan{<:Tuple{AbstractVector{<:Any},AbstractVector{<:TwoBar}}})
 
     # our first argument is an observable of parametric type AbstractVector{<:Real}
     times = sc[1]
@@ -43,7 +43,6 @@ function Makie.plot!(
     # and barplots we need to draw
     # this is necessary because in Makie we want every recipe to be interactively updateable
     # and therefore need to connect the observable machinery to do so
-    linesegs = Observable(Point2f[])
     bar_froms = Observable(Float32[])
     bar_tos = Observable(Float32[])
     colors = Observable(Bool[])
@@ -54,15 +53,12 @@ function Makie.plot!(
         colors[]
 
         # clear the vectors inside the observables
-        empty!(linesegs[])
         empty!(bar_froms[])
         empty!(bar_tos[])
         empty!(colors[])
 
         # then refill them with our updated values
         for (t, s) in zip(times, stockvalues)
-            push!(linesegs[], Point2f(t, s.low))
-            push!(linesegs[], Point2f(t, s.high))
             push!(bar_froms[], s.open)
             push!(bar_tos[], s.close)
         end
@@ -91,8 +87,7 @@ function Makie.plot!(
     # in the last step we plot into our `sc` ResamplerSpan object, which means
     # that our new plot is just made out of two simpler recipes layered on
     # top of each other
-    linesegments!(sc, linesegs, color=colors, colormap=colormap)
-    barplot!(sc, times, bar_froms, fillto=bar_tos, color=colors, strokewidth=0, colormap=colormap)
+    barplot!(sc, times, bar_froms, fillto=bar_tos, color=colors, strokewidth=0, colormap=colormap, direction=:x)
 
     # lastly we return the new ResamplerSpan
     sc
