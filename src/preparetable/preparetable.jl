@@ -83,7 +83,7 @@ function preparetable!(PT::PrepareTable, PTC::ConfigSeriesToSupervised)
     fullX, y0, t0 = series2supervised(
         df[!, PT.status.args.input_features] => PTC.shift_x,
         df[!, PT.status.args.target_features] => PTC.shift_y,
-        df[!, [:datetime]] => PTC.shift_y)
+        df[!, [:datetime]] => PTC.shift_t)
 
     # t0v = only(eachcol(t0))
     # x0v = eachindex(t0v) |> collect

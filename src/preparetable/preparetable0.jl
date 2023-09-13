@@ -1,3 +1,13 @@
+abstract type Comparable end
+# This abstract type is required for not breaking things when defining your custom `==`.
+# See https://stackoverflow.com/questions/62336686/struct-equality-with-arrays
+# and https://stackoverflow.com/questions/66801702/deriving-equality-for-julia-structs-with-mutable-members
+
+function Base.:(==)(a::T, b::T) where {T<:Union{Comparable,Cols}} # because Cols is not comparable.
+    fields = fieldnames(T)
+    getfield.(Ref(a), fields) == getfield.(Ref(b), fields)
+end
+
 #  ━━▶ ━━━┓
 # ━┃ ┓ ┗┓⮕
 # ┻ ┳┛┏
@@ -79,7 +89,7 @@ mutable struct Cache
 end
 
 
-abstract type PrepareTableConfig end
+abstract type PrepareTableConfig <: Comparable end
 PTCdocstring = "Use keyword arguments to construct the object."
 
 """
@@ -88,26 +98,50 @@ PTCdocstring = "Use keyword arguments to construct the object."
 $PTCdocstring
 
 # Example
-```julia
-ConfigSeriesToSupervised(;
+```jldoctest
+using SWCForecastBase: ConfigSeriesToSupervised
+config1 = ConfigSeriesToSupervised(;
         shift_x         = [0, -6, -12, -24, -36, -48, -60, -72],
         shift_y         = [1],
+        shift_t         = [1]
         )
+
+config2 = ConfigSeriesToSupervised(;
+        shift_x         = [0, -6, -12, -24, -36, -48, -60, -72],
+        shift_y         = [1],
+        ) # by default, `shift_t` is fixed to the time of target feature (`shift_y`) if not assigned manually.
+
+config1 == config2
+
+# output
+
+true
 ```
+
+which is equivalent to
 
 - `shift_x`: the time shift for the data using as the input features
 - `shift_y`: the time shift for the data using as the target features
+
+
 """
 struct ConfigSeriesToSupervised <: PrepareTableConfig
     shift_x::Vector{<:Int}
     shift_y::Vector{<:Int}
+    shift_t::Vector{<:Int}
     function ConfigSeriesToSupervised(;
         shift_x=[0, -6, -12, -24, -36, -48, -60, -72],
-        shift_y=[1]
+        shift_y=[1],
+        shift_t=[]
     )
-        new(shift_x, shift_y)
+        if isempty(shift_t)
+            shift_t = shift_y
+        end
+        new(shift_x, shift_y, shift_t)
     end
 end
+
+
 
 """
 `ConfigPreprocess` is the configuration for a table of time series input/target features.
